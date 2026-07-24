@@ -48,6 +48,26 @@ let headerImageSrcBefore = null;
 let headerImageSrcAfter = null;
 let yearImageSrc = null;
 let sidebarMonthImageSrc = null;
+let currentImageTarget = 'headerImageSrcBefore';
+
+function selectImageTarget(target) {
+  currentImageTarget = target;
+  document.querySelectorAll('.img-tgt-btn').forEach(b => {
+    if (b.dataset.target === target) {
+      b.classList.add('active');
+    } else {
+      b.classList.remove('active');
+    }
+  });
+}
+
+function clearCurrentImage() {
+  if (currentImageTarget === 'headerImageSrcBefore') headerImageSrcBefore = null;
+  else if (currentImageTarget === 'headerImageSrcAfter') headerImageSrcAfter = null;
+  else if (currentImageTarget === 'yearImageSrc') yearImageSrc = null;
+  else if (currentImageTarget === 'sidebarMonthImageSrc') sidebarMonthImageSrc = null;
+  renderPreview();
+}
 
 function init() {
   populateYears();
@@ -55,64 +75,20 @@ function init() {
   renderTemplates();
   renderPreview();
 
-  document.getElementById('monthImageBefore').addEventListener('change', function(e) {
+  document.getElementById('sharedImageUpload').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = function(event) {
-        headerImageSrcBefore = event.target.result;
+        if (currentImageTarget === 'headerImageSrcBefore') headerImageSrcBefore = event.target.result;
+        else if (currentImageTarget === 'headerImageSrcAfter') headerImageSrcAfter = event.target.result;
+        else if (currentImageTarget === 'yearImageSrc') yearImageSrc = event.target.result;
+        else if (currentImageTarget === 'sidebarMonthImageSrc') sidebarMonthImageSrc = event.target.result;
         renderPreview();
       };
       reader.readAsDataURL(file);
-    } else {
-      headerImageSrcBefore = null;
-      renderPreview();
     }
-  });
-
-  document.getElementById('monthImageAfter').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        headerImageSrcAfter = event.target.result;
-        renderPreview();
-      };
-      reader.readAsDataURL(file);
-    } else {
-      headerImageSrcAfter = null;
-      renderPreview();
-    }
-  });
-
-  document.getElementById('yearImageUpload').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        yearImageSrc = event.target.result;
-        renderPreview();
-      };
-      reader.readAsDataURL(file);
-    } else {
-      yearImageSrc = null;
-      renderPreview();
-    }
-  });
-
-  document.getElementById('sidebarMonthImageUpload').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        sidebarMonthImageSrc = event.target.result;
-        renderPreview();
-      };
-      reader.readAsDataURL(file);
-    } else {
-      sidebarMonthImageSrc = null;
-      renderPreview();
-    }
+    this.value = '';
   });
 
   document.getElementById('bgOpacity').addEventListener('input', renderPreview);
@@ -128,6 +104,7 @@ function init() {
     execCmdVal('fontName', this.value);
   });
   document.getElementById('editorArea').addEventListener('input', renderPreview);
+  window.addEventListener('resize', adjustMobileScale);
 }
 
 function populateYears() {
@@ -444,6 +421,7 @@ function renderPreview() {
     if (btnGenerateAll) btnGenerateAll.style.display = 'block';
     document.getElementById('prevMonthBtn').disabled = previewMonthIndex === 0;
     document.getElementById('nextMonthBtn').disabled = previewMonthIndex === 11;
+    adjustMobileScale();
     return;
   }
 
@@ -460,6 +438,7 @@ function renderPreview() {
     if (btnGenerateAll) btnGenerateAll.style.display = 'block';
     document.getElementById('prevMonthBtn').disabled = previewMonthIndex === 0;
     document.getElementById('nextMonthBtn').disabled = previewMonthIndex === 11;
+    adjustMobileScale();
     return;
   }
 
@@ -489,6 +468,36 @@ function renderPreview() {
   html += `</div>`;
 
   preview.innerHTML = html;
+  adjustMobileScale();
+}
+
+function adjustMobileScale() {
+  const wrapper = document.querySelector('.preview-wrapper');
+  const cal = document.getElementById('calendarPreview');
+  if (!wrapper || !cal) return;
+  
+  if (window.innerWidth <= 1024) {
+    cal.style.transform = 'none';
+    wrapper.style.height = 'auto';
+    
+    const wrapperWidth = wrapper.clientWidth;
+    const calWidth = cal.offsetWidth;
+    const calHeight = cal.offsetHeight;
+    
+    if (calWidth > 0 && wrapperWidth > 0) {
+      let scale = wrapperWidth / calWidth;
+      scale = Math.min(scale, 1);
+      
+      cal.style.transform = `scale(${scale})`;
+      cal.style.transformOrigin = 'top center';
+      cal.style.marginBottom = '0';
+      wrapper.style.height = `${calHeight * scale}px`;
+    }
+  } else {
+    cal.style.transform = 'none';
+    cal.style.marginBottom = '0';
+    wrapper.style.height = 'auto';
+  }
 }
 
 function changePreviewMonth(delta) {

@@ -143,18 +143,25 @@
     }
 
     /* Tab visibility logic */
-    body:not([data-mobile-tab="layout"]):not([data-mobile-tab="settings"]) .topbar-controls,
-    body:not([data-mobile-tab="layout"]):not([data-mobile-tab="settings"]) .sidebar-right,
+    /* Default (no attribute set), treat as "format" active */
+    body:not([data-mobile-tab]) .topbar-controls,
+    body:not([data-mobile-tab]) .sidebar-right {
+      display: none !important;
+    }
+    body:not([data-mobile-tab]) .sidebar-controls {
+      display: flex !important;
+    }
+
+    /* "format" explicitly set */
     body[data-mobile-tab="format"] .topbar-controls,
     body[data-mobile-tab="format"] .sidebar-right {
       display: none !important;
     }
-    
-    body[data-mobile-tab="format"] .sidebar-controls,
-    body:not([data-mobile-tab="layout"]):not([data-mobile-tab="settings"]) .sidebar-controls {
+    body[data-mobile-tab="format"] .sidebar-controls {
       display: flex !important;
     }
 
+    /* "layout" explicitly set */
     body[data-mobile-tab="layout"] .topbar-controls,
     body[data-mobile-tab="layout"] .sidebar-controls {
       display: none !important;
@@ -163,12 +170,20 @@
       display: flex !important;
     }
 
+    /* "settings" explicitly set */
     body[data-mobile-tab="settings"] .sidebar-controls,
     body[data-mobile-tab="settings"] .sidebar-right {
       display: none !important;
     }
     body[data-mobile-tab="settings"] .topbar-controls {
       display: block !important;
+    }
+
+    /* "none" explicitly set (all hidden) */
+    body[data-mobile-tab="none"] .sidebar-controls,
+    body[data-mobile-tab="none"] .sidebar-right,
+    body[data-mobile-tab="none"] .topbar-controls {
+      display: none !important;
     }
   }
 
@@ -596,6 +611,28 @@
     background: var(--dot-color, inherit);
   }
 
+  .img-tgt-btn {
+    padding: 0.4rem 0.8rem;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-light);
+    transition: var(--transition);
+    flex: 1 1 45%;
+    text-align: center;
+  }
+  .img-tgt-btn:hover {
+    border-color: var(--primary-light);
+  }
+  .img-tgt-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+
   .btn-generate {
     display: block;
     width: 100%;
@@ -859,9 +896,6 @@
 
   @media (max-width: 768px) {
     .controls-grid { grid-template-columns: 1fr 1fr; }
-    .calendar-page { transform: scale(0.55); transform-origin: top center; margin-bottom: -300px; }
-    .page-a3 { transform: scale(0.4); margin-bottom: -500px; }
-    .page-tabloid { transform: scale(0.42); margin-bottom: -500px; }
     .single-month-page .big-header .month-name { font-size: 2rem; }
     .single-month-page .day-cell .day-num { font-size: 1.4rem; }
     .single-month-page .day-headers div { font-size: 0.75rem; padding: 0.3rem 0; }
@@ -872,7 +906,6 @@
     .controls-grid { grid-template-columns: 1fr; }
     .container { padding: 1rem 0.5rem; }
     .control-panel, .editor-panel, .preview-section { padding: 1rem; }
-    .calendar-page { transform: scale(0.45); margin-bottom: -380px; }
     .header { padding: 1.5rem 0.75rem; }
     .single-month-page .big-header { padding: 1.2rem 1rem; }
     .single-month-page .big-header .month-name { font-size: 1.6rem; letter-spacing: 1.5px; }

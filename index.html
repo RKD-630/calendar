@@ -65,21 +65,23 @@
   <div class="control-panel">
     <h2>🎨 Image &amp; Colors</h2>
     <div class="controls-grid">
-      <div class="control-group">
-        <label>🖼️ Left Header Image</label>
-        <input type="file" id="monthImageBefore" accept="image/png, image/gif" />
-      </div>
-      <div class="control-group">
-        <label>🖼️ Right Header Image</label>
-        <input type="file" id="monthImageAfter" accept="image/png, image/gif" />
-      </div>
-      <div class="control-group">
-        <label>🖼️ Year Header Image</label>
-        <input type="file" id="yearImageUpload" accept="image/png, image/gif" />
-      </div>
-      <div class="control-group">
-        <label>🖼️ Sidebar Month Image</label>
-        <input type="file" id="sidebarMonthImageUpload" accept="image/png, image/gif" />
+      <div class="control-group" style="grid-column: 1 / -1;">
+        <label>🖼️ Select Image Target</label>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.5rem 0;">
+          <button type="button" class="img-tgt-btn active" data-target="headerImageSrcBefore" onclick="selectImageTarget('headerImageSrcBefore')">Left Header Image</button>
+          <button type="button" class="img-tgt-btn" data-target="headerImageSrcAfter" onclick="selectImageTarget('headerImageSrcAfter')">Right Header Image</button>
+          <button type="button" class="img-tgt-btn" data-target="yearImageSrc" onclick="selectImageTarget('yearImageSrc')">Year Header Image</button>
+          <button type="button" class="img-tgt-btn" data-target="sidebarMonthImageSrc" onclick="selectImageTarget('sidebarMonthImageSrc')">Sidebar Month Image</button>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn-generate" style="margin:0; padding: 0.6rem 1rem; font-size: 0.85rem; flex: 1;" onclick="document.getElementById('sharedImageUpload').click()">
+            📁 Browse File
+          </button>
+          <button type="button" class="nav-btn" style="background:var(--danger); padding: 0 1rem; display: flex; align-items: center;" onclick="clearCurrentImage()">
+            🗑️ Clear
+          </button>
+        </div>
+        <input type="file" id="sharedImageUpload" accept="image/png, image/gif, image/jpeg" style="display: none;" />
       </div>
       <div class="control-group">
         <label>💧 Background Opacity</label>
@@ -185,9 +187,16 @@
 
 <script>
   function switchMobileTab(tab) {
-    document.body.setAttribute('data-mobile-tab', tab);
-    document.querySelectorAll('.bottom-nav-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById('nav-tab-' + tab).classList.add('active');
+    const currentTab = document.body.getAttribute('data-mobile-tab') || 'format';
+    
+    if (currentTab === tab) {
+      document.body.setAttribute('data-mobile-tab', 'none');
+      document.querySelectorAll('.bottom-nav-btn').forEach(btn => btn.classList.remove('active'));
+    } else {
+      document.body.setAttribute('data-mobile-tab', tab);
+      document.querySelectorAll('.bottom-nav-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('nav-tab-' + tab).classList.add('active');
+    }
   }
 </script>
 
