@@ -168,8 +168,28 @@
   <p>📅 PDF Calendar Generator © 2026 — Built with ❤️</p>
 </footer>
 
+<nav class="mobile-bottom-nav">
+  <button class="bottom-nav-btn active" onclick="switchMobileTab('format')" id="nav-tab-format">
+    <span class="icon">🎨</span>
+    <span>Format</span>
+  </button>
+  <button class="bottom-nav-btn" onclick="switchMobileTab('layout')" id="nav-tab-layout">
+    <span class="icon">📐</span>
+    <span>Layout</span>
+  </button>
+  <button class="bottom-nav-btn" onclick="switchMobileTab('settings')" id="nav-tab-settings">
+    <span class="icon">⚙️</span>
+    <span>Settings</span>
+  </button>
+</nav>
 
-
+<script>
+  function switchMobileTab(tab) {
+    document.body.setAttribute('data-mobile-tab', tab);
+    document.querySelectorAll('.bottom-nav-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('nav-tab-' + tab).classList.add('active');
+  }
+</script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>

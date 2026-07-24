@@ -80,8 +80,96 @@
   @media (max-width: 1400px) {
     .container { grid-template-columns: 300px 1fr 300px; gap: 1rem; }
   }
+  .mobile-bottom-nav {
+    display: none;
+  }
+
   @media (max-width: 1024px) {
-    .container { grid-template-columns: 1fr; }
+    body {
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 70px;
+    }
+    
+    .header { order: 1; }
+    .container { display: contents; }
+    
+    .main-content { order: 2; padding: 1rem; }
+    .sidebar-controls { order: 3; padding: 1rem; position: static; max-height: none; overflow-y: visible; }
+    .sidebar-right { order: 3; padding: 1rem; position: static; max-height: none; overflow-y: visible; }
+    .topbar-controls { order: 3; padding: 1rem; border-bottom: none; }
+    .footer { order: 4; }
+
+    .mobile-bottom-nav {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+      z-index: 1000;
+      justify-content: space-around;
+      padding: 0.5rem 0;
+      border-top: 1px solid var(--border);
+    }
+    
+    .bottom-nav-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .bottom-nav-btn.active {
+      color: var(--primary);
+    }
+    
+    .bottom-nav-btn .icon {
+      font-size: 1.4rem;
+      transition: transform 0.2s ease;
+    }
+    
+    .bottom-nav-btn.active .icon {
+      transform: translateY(-2px);
+    }
+
+    /* Tab visibility logic */
+    body:not([data-mobile-tab="layout"]):not([data-mobile-tab="settings"]) .topbar-controls,
+    body:not([data-mobile-tab="layout"]):not([data-mobile-tab="settings"]) .sidebar-right,
+    body[data-mobile-tab="format"] .topbar-controls,
+    body[data-mobile-tab="format"] .sidebar-right {
+      display: none !important;
+    }
+    
+    body[data-mobile-tab="format"] .sidebar-controls,
+    body:not([data-mobile-tab="layout"]):not([data-mobile-tab="settings"]) .sidebar-controls {
+      display: flex !important;
+    }
+
+    body[data-mobile-tab="layout"] .topbar-controls,
+    body[data-mobile-tab="layout"] .sidebar-controls {
+      display: none !important;
+    }
+    body[data-mobile-tab="layout"] .sidebar-right {
+      display: flex !important;
+    }
+
+    body[data-mobile-tab="settings"] .sidebar-controls,
+    body[data-mobile-tab="settings"] .sidebar-right {
+      display: none !important;
+    }
+    body[data-mobile-tab="settings"] .topbar-controls {
+      display: block !important;
+    }
   }
 
   .sidebar-controls, .sidebar-right {
