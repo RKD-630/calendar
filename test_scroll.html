@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; }
+  .preview-wrapper { width: 350px; overflow-x: hidden; border: 1px solid red; }
+  .calendar-page { width: 595px; height: 842px; background: lightblue; transform-origin: top left; }
+</style>
+</head>
+<body>
+<div class="preview-wrapper">
+  <div class="calendar-page" id="cal"></div>
+</div>
+<script>
+  const wrapper = document.querySelector('.preview-wrapper');
+  const cal = document.getElementById('cal');
+  const wrapperWidth = wrapper.clientWidth;
+  const calWidth = cal.offsetWidth;
+  const calHeight = cal.offsetHeight;
+  const scale = wrapperWidth / calWidth;
+  cal.style.transform = `scale(${scale})`;
+  wrapper.style.height = `${calHeight * scale}px`;
+  
+  // Check if it has vertical scrollbar
+  console.log("Wrapper scrollHeight: ", wrapper.scrollHeight, " clientHeight: ", wrapper.clientHeight);
+</script>
+</body>
+</html>

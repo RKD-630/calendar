@@ -479,6 +479,9 @@ function adjustMobileScale() {
   if (window.innerWidth <= 1024) {
     cal.style.transform = 'none';
     wrapper.style.height = 'auto';
+    wrapper.style.justifyContent = 'flex-start';
+    wrapper.style.overflow = 'hidden';
+    wrapper.style.padding = '0';
     
     const wrapperWidth = wrapper.clientWidth;
     const calWidth = cal.offsetWidth;
@@ -489,7 +492,7 @@ function adjustMobileScale() {
       scale = Math.min(scale, 1);
       
       cal.style.transform = `scale(${scale})`;
-      cal.style.transformOrigin = 'top center';
+      cal.style.transformOrigin = 'top left';
       cal.style.marginBottom = '0';
       wrapper.style.height = `${calHeight * scale}px`;
     }
@@ -497,6 +500,9 @@ function adjustMobileScale() {
     cal.style.transform = 'none';
     cal.style.marginBottom = '0';
     wrapper.style.height = 'auto';
+    wrapper.style.justifyContent = 'center';
+    wrapper.style.overflow = 'auto';
+    wrapper.style.padding = '';
   }
 }
 

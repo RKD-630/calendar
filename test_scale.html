@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  .preview-wrapper { width: 350px; overflow-x: hidden; border: 1px solid red; }
+  .calendar-page { width: 842px; min-height: 595px; background: lightblue; position: relative; overflow: hidden; transform-origin: top left; }
+  .landscape-month-page { width: 100%; height: 100%; padding: 10px; box-sizing: border-box; }
+</style>
+</head>
+<body>
+<div class="preview-wrapper">
+  <div class="calendar-page" id="cal">
+    <div class="landscape-month-page">
+      <h1>Landscape Content</h1>
+      <div style="height: 600px; background: yellow;"></div>
+    </div>
+  </div>
+</div>
+<script>
+  const wrapper = document.querySelector('.preview-wrapper');
+  const cal = document.getElementById('cal');
+  const wrapperWidth = wrapper.clientWidth;
+  const calWidth = cal.offsetWidth;
+  const calHeight = cal.offsetHeight;
+  const scale = wrapperWidth / calWidth;
+  cal.style.transform = `scale(${scale})`;
+  wrapper.style.height = `${calHeight * scale}px`;
+</script>
+</body>
+</html>
