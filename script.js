@@ -93,6 +93,9 @@ function init() {
 
   document.getElementById('bgOpacity').addEventListener('input', renderPreview);
   document.getElementById('globalTextColor').addEventListener('input', renderPreview);
+  if (document.getElementById('hideMiniCal')) {
+    document.getElementById('hideMiniCal').addEventListener('change', renderPreview);
+  }
 
   document.getElementById('yearSelect').addEventListener('change', () => { renderPreview(); });
   document.getElementById('pageFormat').addEventListener('change', renderPreview);
@@ -322,6 +325,7 @@ function renderLandscapeMonthPageHTML(year, month, startDay, theme) {
   const borderColor = theme.border || theme.primary;
   const textColor = theme.text || '#ffffff';
   const titleColor = (theme.primary === '#ffffff' || theme.name === 'Light Gray') ? '#000000' : theme.primary;
+  const monthTitleColor = (theme.name === 'Light Gray') ? '#000000' : titleColor;
   
   let html = `<div class="landscape-month-page">`;
   
@@ -332,7 +336,7 @@ function renderLandscapeMonthPageHTML(year, month, startDay, theme) {
       <div class="ls-top">
          <div class="ls-year" style="color: ${titleColor};">${year}${yearImgHtml}</div>
       </div>
-      <div class="ls-month-name" style="color: ${titleColor};">${MONTHS[month].substring(0,3).toUpperCase()}</div>
+      <div class="ls-month-name" style="color: ${monthTitleColor};">${MONTHS[month].substring(0,3).toUpperCase()}</div>
       ${sidebarMonthImageSrc ? `<div style="text-align: center; margin-bottom: 20px;"><img src="${sidebarMonthImageSrc}" style="max-width: 100%; max-height: 150px; border-radius: 8px;" /></div>` : ''}
       <div class="ls-notes">${finalEditorContent}</div>
   </div>`;
@@ -751,22 +755,27 @@ function renderNew1ColMonthPageHTML(year, month, startDay, theme) {
   const highlightDates = highlightInput.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d));
 
   for (let r = 0; r < 7; r++) {
-    const dayName = DAYS_FULL[(r + startDay) % 7].substring(0,3).toUpperCase();
-    html += `<div class="t1-day-label">${dayName}</div>`;
+    const dayIndex = (r + startDay) % 7;
+    const isSunday = dayIndex === 0;
+    const dayName = DAYS_FULL[dayIndex].substring(0,3).toUpperCase();
+    
+    let dayLabelStyle = isSunday ? 'background: #ef4444; color: white;' : '';
+    html += `<div class="t1-day-label ${isSunday ? 'sunday' : ''}" style="${dayLabelStyle}">${dayName}</div>`;
     
     for (let w = 0; w < weeks.length; w++) {
       const dayNum = weeks[w][r];
       if (dayNum) {
         let isToday = (year === today.getFullYear() && month === today.getMonth() && dayNum === today.getDate());
         let styleStr = '';
-        let numStyle = '';
+        let numStyle = isSunday ? 'color: #ef4444;' : '';
         if (isToday) {
            styleStr = `background: var(--primary); color: white;`;
+           numStyle = 'color: white;';
         }
         if (highlightDates.includes(dayNum)) {
            numStyle = `color: ${highlightColor};`;
         }
-        html += `<div class="t1-day-cell" style="${styleStr}">
+        html += `<div class="t1-day-cell ${isSunday ? 'sunday' : ''}" style="${styleStr}">
                    <div class="t1-day-num" style="${numStyle}">${dayNum}</div>
                  </div>`;
       } else {
@@ -776,26 +785,30 @@ function renderNew1ColMonthPageHTML(year, month, startDay, theme) {
   }
   html += `</div>`;
   
-  let prevMonth = month - 1;
-  let prevYear = year;
-  if (prevMonth < 0) { prevMonth = 11; prevYear--; }
+  const hideMiniCal = document.getElementById('hideMiniCal') ? document.getElementById('hideMiniCal').checked : false;
   
-  let nextMonth = month + 1;
-  let nextYear = year;
-  if (nextMonth > 11) { nextMonth = 0; nextYear++; }
-  
-  html += `
-    <div class="t1-footer">
-      <div class="t1-mini-cal">${renderMiniCal(prevYear, prevMonth, startDay, theme)}</div>
-      <div class="t1-notes">
-         <div class="t1-notes-title">NOTES</div>
-         <div class="t1-notes-lines">
-            <div></div><div></div><div></div><div></div><div></div>
-         </div>
+  if (!hideMiniCal) {
+    let prevMonth = month - 1;
+    let prevYear = year;
+    if (prevMonth < 0) { prevMonth = 11; prevYear--; }
+    
+    let nextMonth = month + 1;
+    let nextYear = year;
+    if (nextMonth > 11) { nextMonth = 0; nextYear++; }
+    
+    html += `
+      <div class="t1-footer">
+        <div class="t1-mini-cal">${renderMiniCal(prevYear, prevMonth, startDay, theme)}</div>
+        <div class="t1-notes">
+           <div class="t1-notes-title">NOTES</div>
+           <div class="t1-notes-lines">
+              <div></div><div></div><div></div><div></div><div></div>
+           </div>
+        </div>
+        <div class="t1-mini-cal">${renderMiniCal(nextYear, nextMonth, startDay, theme)}</div>
       </div>
-      <div class="t1-mini-cal">${renderMiniCal(nextYear, nextMonth, startDay, theme)}</div>
-    </div>
-  `;
+    `;
+  }
   
   html += `</div>`;
   return html;
@@ -810,14 +823,22 @@ function renderMiniCal(year, month, startDay, theme) {
   
   html += `<div class="mini-cal-grid">`;
   for (let i = 0; i < 7; i++) {
-    html += `<div class="mini-cal-th">${DAYS_FULL[(i + startDay) % 7].substring(0,3).toUpperCase()}</div>`;
+    const dayIndex = (i + startDay) % 7;
+    const isSunday = dayIndex === 0;
+    html += `<div class="mini-cal-th ${isSunday ? 'sunday' : ''}">${DAYS_FULL[dayIndex].substring(0,3).toUpperCase()}</div>`;
   }
   
   for (let i = 0; i < firstDay; i++) {
     html += `<div></div>`;
   }
   for (let day = 1; day <= daysInMonth; day++) {
-    html += `<div class="mini-cal-td">${day}</div>`;
+    const dayIndex = (firstDay + day - 1) % 7;
+    const isSunday = dayIndex === 0;
+    html += `<div class="mini-cal-td ${isSunday ? 'sunday' : ''}">${day}</div>`;
+  }
+  const totalFilled = firstDay + daysInMonth;
+  for (let i = totalFilled; i < 42; i++) {
+    html += `<div></div>`;
   }
   html += `</div></div>`;
   return html;
