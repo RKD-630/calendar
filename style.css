@@ -596,7 +596,7 @@
     width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
     font-size: 2rem; font-weight: bold; color: white;
   }
-  .ls-month-name { font-size: 5rem; font-weight: 900; text-align: center; margin-bottom: 20px; line-height: 1; }
+  .ls-month-name { font-weight: 900; text-align: center; margin-bottom: 20px; line-height: 1.2; max-width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .ls-notes { flex: 1; font-size: 1.1rem; color: #444; text-align: center; }
   
   .landscape-grid { flex: 1; display: flex; border-radius: 12px; overflow: hidden; }
@@ -759,8 +759,12 @@
   }
   .t1-header-left {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.9rem;
+    justify-content: center;
+    text-align: center;
+    gap: 0.2rem;
+    flex: 1;
   }
   .t1-month-num {
     background: var(--primary);
@@ -772,12 +776,26 @@
     line-height: 1;
   }
   .t1-month-name {
-    font-size: 2.84rem;
+    font-size: 4.97rem;
     font-weight: 900;
     color: #333;
     line-height: 1;
     letter-spacing: 1px;
     overflow: visible;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .t1-month-sub {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.5px;
+    margin-top: 0.3rem;
+    text-align: center;
+    width: 100%;
   }
   .t1-year {
     font-size: 2.84rem;
@@ -848,15 +866,16 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
   .mini-cal-wrapper {
     background: transparent;
     display: flex;
     flex-direction: column;
     height: 100%;
-    transform: scale(1.08, 1.05);
-    transform-origin: center;
-    border-radius: 15px;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 12px;
     overflow: hidden;
   }
   .mini-cal-title {
@@ -864,32 +883,37 @@
     color: white;
     text-align: center;
     font-weight: 700;
-    padding: 0.42rem 0.35rem;
-    border-radius: 15px 15px 0 0;
-    font-size: 0.76rem;
+    padding: 0.35rem 0.25rem;
+    border-radius: 12px 12px 0 0;
+    font-size: 0.65rem;
     white-space: nowrap;
-    overflow: visible;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
   }
   .mini-cal-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: auto repeat(6, 1fr);
-    gap: 3px;
+    gap: 2px;
     background: var(--light-bg);
-    padding: 0.52rem 0.5rem;
-    border-radius: 0 0 15px 15px;
+    padding: 0.35rem 0.3rem;
+    border-radius: 0 0 12px 12px;
     flex: 1;
+    box-sizing: border-box;
+    overflow: hidden;
   }
   .mini-cal-th {
     background: var(--primary);
     color: white;
-    font-size: 0.48rem;
+    font-size: 0.45rem;
     font-weight: bold;
     text-align: center;
-    padding: 3px 0;
-    border-radius: 4px;
-    overflow: visible;
-    line-height: 1.25;
+    padding: 2px 0;
+    border-radius: 3px;
+    overflow: hidden;
+    line-height: 1.2;
+    box-sizing: border-box;
   }
   .mini-cal-th.sunday {
     background: #ef4444;
@@ -897,18 +921,18 @@
   }
   .mini-cal-td {
     text-align: center;
-    font-size: 0.7rem;
+    font-size: 0.62rem;
     font-weight: bold;
     color: #444;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: visible;
+    overflow: hidden;
     background: rgba(255, 255, 255, 0.75);
-    border-radius: 5px;
-    padding: 2px 0;
-    min-height: 1.15em;
-    line-height: 1.25;
+    border-radius: 4px;
+    padding: 1px 0;
+    box-sizing: border-box;
+    line-height: 1.2;
   }
   .mini-cal-td.sunday {
     color: #ef4444;

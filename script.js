@@ -22,9 +22,301 @@ const TEMPLATES = [
   { name: '4 Columns',    cols: 4, icon: '▧', cls: 'tpl-4col' },
 ];
 
-const MONTHS = ['January','February','March','April','May','June',
+const MONTHS_EN = ['January','February','March','April','May','June',
                 'July','August','September','October','November','December'];
-const DAYS_FULL = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS_HI = ['जनवरी','फरवरी','मार्च','अप्रैल','मई','जून',
+                'जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'];
+
+const DAYS_FULL_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DAYS_FULL_HI = ['रविवार','सोमवार','मंगलवार','बुधवार','गुरुवार','शुक्रवार','शनिवार'];
+const DAYS_SHORT_HI = ['रवि','सोम','मंगल','बुध','गुरु','शुक्र','शनि'];
+
+let isHindiCalendar = false;
+
+const MONTHS_PANCHANG = [
+  'पौष - माघ',
+  'माघ - फाल्गुन',
+  'फाल्गुन - चैत्र',
+  'चैत्र - वैशाख',
+  'वैशाख - ज्येष्ठ',
+  'ज्येष्ठ - आषाढ़',
+  'आषाढ़ - श्रावण',
+  'श्रावण - भाद्रपद',
+  'भाद्रपद - आश्विन',
+  'आश्विन - कार्तिक',
+  'कार्तिक - मार्गशीर्ष',
+  'मार्गशीर्ष - पौष'
+];
+
+const MONTHS_PANCHANG_FULL = [
+  'पौष - माघ (जनवरी)',
+  'माघ - फाल्गुन (फरवरी)',
+  'फाल्गुन - चैत्र (मार्च)',
+  'चैत्र - वैशाख (अप्रैल)',
+  'वैशाख - ज्येष्ठ (मई)',
+  'ज्येष्ठ - आषाढ़ (जून)',
+  'आषाढ़ - श्रावण (जुलाई)',
+  'श्रावण - भाद्रपद (अगस्त)',
+  'भाद्रपद - आश्विन (सितंबर)',
+  'आश्विन - कार्तिक (अक्टूबर)',
+  'कार्तिक - मार्गशीर्ष (नवंबर)',
+  'मार्गशीर्ष - पौष (दिसंबर)'
+];
+
+const MONTHS_PANCHANG_CHAITRA = [
+  '१. चैत्र - वैशाख (मार्च/अप्रैल)',
+  '२. वैशाख - ज्येष्ठ (अप्रैल/मई)',
+  '३. ज्येष्ठ - आषाढ़ (मई/जून)',
+  '४. आषाढ़ - श्रावण (जून/जुलाई)',
+  '५. श्रावण - भाद्रपद (जुलाई/अगस्त)',
+  '६. भाद्रपद - आश्विन (अगस्त/सितंबर)',
+  '७. आश्विन - कार्तिक (सितंबर/अक्टूबर)',
+  '८. कार्तिक - मार्गशीर्ष (अक्टूबर/नवंबर)',
+  '९. मार्गशीर्ष - पौष (नवंबर/दिसंबर)',
+  '१०. पौष - माघ (दिसंबर/जनवरी)',
+  '११. माघ - फाल्गुन (जनवरी/फरवरी)',
+  '१२. फाल्गुन - चैत्र (फरवरी/मार्च)'
+];
+
+function formatNumber(num) {
+  if (!isHindiCalendar) return num;
+  const useHindi = document.getElementById('useHindiDigits');
+  if (useHindi && !useHindi.checked) return num;
+  
+  const hindiDigits = ['०','१','२','३','४','५','६','७','८','९'];
+  return String(num).replace(/[0-9]/g, w => hindiDigits[+w]);
+}
+
+function getMonthName(monthIndex, isShort = false) {
+  if (isHindiCalendar) {
+    const styleEl = document.getElementById('hindiMonthStyle');
+    const style = styleEl ? styleEl.value : 'panchang_chaitra';
+    
+    if (style === 'panchang_chaitra') {
+      return MONTHS_PANCHANG_CHAITRA[monthIndex];
+    } else if (style === 'panchang') {
+      return MONTHS_PANCHANG[monthIndex];
+    } else if (style === 'panchang_greg') {
+      return MONTHS_PANCHANG_FULL[monthIndex];
+    } else {
+      return MONTHS_HI[monthIndex];
+    }
+  }
+  const name = MONTHS_EN[monthIndex];
+  return isShort ? name.substring(0, 3).toUpperCase() : name;
+}
+
+function getMonthNameStyle(monthStr, baseRem = 4.55) {
+  const len = monthStr ? monthStr.length : 0;
+  let scale = 1.0;
+  if (len > 32) scale = 0.38;
+  else if (len > 25) scale = 0.48;
+  else if (len > 18) scale = 0.60;
+  else if (len > 12) scale = 0.75;
+  else if (len > 8) scale = 0.88;
+
+  const fontRem = baseRem * scale;
+  return `font-size: ${fontRem.toFixed(2)}rem; white-space: nowrap; word-break: keep-all; line-height: 1.2; max-width: 100%; text-align: center; display: flex; justify-content: center; align-items: center;`;
+}
+
+function getMonthHeaderHTML(monthIndex, hideSub = false) {
+  if (!isHindiCalendar) {
+    return getMonthName(monthIndex);
+  }
+
+  const styleEl = document.getElementById('hindiMonthStyle');
+  const style = styleEl ? styleEl.value : 'panchang_chaitra';
+  const colorPanchang = document.getElementById('colorPanchangDays');
+  const isColoring = colorPanchang ? colorPanchang.checked : true;
+
+  if (!isColoring || style === 'hindi_greg') {
+    return `<span style="color: #d97706; font-weight: 800;">${getMonthName(monthIndex)}</span>`;
+  }
+
+  let pair;
+  if (style === 'panchang_chaitra') {
+    const chaitraPairs = [
+      { m1: '१. चैत्र', m2: 'वैशाख', sub: '(मार्च/अप्रैल)' },
+      { m1: '२. वैशाख', m2: 'ज्येष्ठ', sub: '(अप्रैल/मई)' },
+      { m1: '३. ज्येष्ठ', m2: 'आषाढ़', sub: '(मई/जून)' },
+      { m1: '४. आषाढ़', m2: 'श्रावण', sub: '(जून/जुलाई)' },
+      { m1: '५. श्रावण', m2: 'भाद्रपद', sub: '(जुलाई/अगस्त)' },
+      { m1: '६. भाद्रपद', m2: 'आश्विन', sub: '(अगस्त/सितंबर)' },
+      { m1: '७. आश्विन', m2: 'कार्तिक', sub: '(सितंबर/अक्टूबर)' },
+      { m1: '८. कार्तिक', m2: 'मार्गशीर्ष', sub: '(अक्टूबर/नवंबर)' },
+      { m1: '९. मार्गशीर्ष', m2: 'पौष', sub: '(नवंबर/दिसंबर)' },
+      { m1: '१०. पौष', m2: 'माघ', sub: '(दिसंबर/जनवरी)' },
+      { m1: '११. माघ', m2: 'फाल्गुन', sub: '(जनवरी/फरवरी)' },
+      { m1: '१२. फाल्गुन', m2: 'चैत्र', sub: '(फरवरी/मार्च)' }
+    ];
+    pair = chaitraPairs[monthIndex];
+  } else {
+    const janPairs = [
+      { m1: 'पौष', m2: 'माघ', sub: '(जनवरी)' },
+      { m1: 'माघ', m2: 'फाल्गुन', sub: '(फरवरी)' },
+      { m1: 'फाल्गुन', m2: 'चैत्र', sub: '(मार्च)' },
+      { m1: 'चैत्र', m2: 'वैशाख', sub: '(अप्रैल)' },
+      { m1: 'वैशाख', m2: 'ज्येष्ठ', sub: '(मई)' },
+      { m1: 'ज्येष्ठ', m2: 'आषाढ़', sub: '(जून)' },
+      { m1: 'आषाढ़', m2: 'श्रावण', sub: '(जुलाई)' },
+      { m1: 'श्रावण', m2: 'भाद्रपद', sub: '(अगस्त)' },
+      { m1: 'भाद्रपद', m2: 'आश्विन', sub: '(सितंबर)' },
+      { m1: 'आश्विन', m2: 'कार्तिक', sub: '(अक्टूबर)' },
+      { m1: 'कार्तिक', m2: 'मार्गशीर्ष', sub: '(नवंबर)' },
+      { m1: 'मार्गशीर्ष', m2: 'पौष', sub: '(दिसंबर)' }
+    ];
+    pair = janPairs[monthIndex];
+  }
+
+  const subStr = (hideSub || style === 'panchang') ? '' : `<span style="font-size: 0.95em; margin-left: 6px; color: #64748b; font-weight: 600;">${pair.sub}</span>`;
+
+  return `<span style="color: #b45309; font-weight: 900; background: #fef3c7; padding: 4px 10px; border-radius: 8px; border: 1px solid #fde68a; font-size: 1.15em;">${pair.m1}</span>` +
+         `<span style="margin: 0 6px; color: #94a3b8; font-weight: 700;">-</span>` +
+         `<span style="color: #0369a1; font-weight: 900; background: #e0f2fe; padding: 4px 10px; border-radius: 8px; border: 1px solid #bae6fd; font-size: 1.15em;">${pair.m2}</span>` +
+         subStr;
+}
+
+function getLandscapeMonthHeaderHTML(monthIndex) {
+  if (!isHindiCalendar) {
+    return `<span style="font-size: 2.34rem; font-weight: 800;">${getMonthName(monthIndex)}</span>`;
+  }
+
+  const styleEl = document.getElementById('hindiMonthStyle');
+  const style = styleEl ? styleEl.value : 'panchang_chaitra';
+  const colorPanchang = document.getElementById('colorPanchangDays');
+  const isColoring = colorPanchang ? colorPanchang.checked : true;
+
+  if (!isColoring || style === 'hindi_greg') {
+    return `<span style="color: #d97706; font-weight: 800; font-size: 2.08rem;">${getMonthName(monthIndex)}</span>`;
+  }
+
+  let pair;
+  if (style === 'panchang_chaitra') {
+    const chaitraPairs = [
+      { m1: '१. चैत्र', m2: 'वैशाख', sub: '(मार्च - अप्रैल)' },
+      { m1: '२. वैशाख', m2: 'ज्येष्ठ', sub: '(अप्रैल - मई)' },
+      { m1: '३. ज्येष्ठ', m2: 'आषाढ़', sub: '(मई - जून)' },
+      { m1: '४. आषाढ़', m2: 'श्रावण', sub: '(जून - जुलाई)' },
+      { m1: '५. श्रावण', m2: 'भाद्रपद', sub: '(जुलाई - अगस्त)' },
+      { m1: '६. भाद्रपद', m2: 'आश्विन', sub: '(अगस्त - सितंबर)' },
+      { m1: '७. आश्विन', m2: 'कार्तिक', sub: '(सितंबर - अक्टूबर)' },
+      { m1: '८. कार्तिक', m2: 'मार्गशीर्ष', sub: '(अक्टूबर - नवंबर)' },
+      { m1: '९. मार्गशीर्ष', m2: 'पौष', sub: '(नवंबर - दिसंबर)' },
+      { m1: '१०. पौष', m2: 'माघ', sub: '(दिसंबर - जनवरी)' },
+      { m1: '११. माघ', m2: 'फाल्गुन', sub: '(जनवरी - फरवरी)' },
+      { m1: '१२. फाल्गुन', m2: 'चैत्र', sub: '(फरवरी - मार्च)' }
+    ];
+    pair = chaitraPairs[monthIndex];
+  } else {
+    const janPairs = [
+      { m1: 'पौष', m2: 'माघ', sub: '(जनवरी)' },
+      { m1: 'माघ', m2: 'फाल्गुन', sub: '(फरवरी)' },
+      { m1: 'फाल्गुन', m2: 'चैत्र', sub: '(मार्च)' },
+      { m1: 'चैत्र', m2: 'वैशाख', sub: '(अप्रैल)' },
+      { m1: 'वैशाख', m2: 'ज्येष्ठ', sub: '(मई)' },
+      { m1: 'ज्येष्ठ', m2: 'आषाढ़', sub: '(जून)' },
+      { m1: 'आषाढ़', m2: 'श्रावण', sub: '(जुलाई)' },
+      { m1: 'श्रावण', m2: 'भाद्रपद', sub: '(अगस्त)' },
+      { m1: 'भाद्रपद', m2: 'आश्विन', sub: '(सितंबर)' },
+      { m1: 'आश्विन', m2: 'कार्तिक', sub: '(अक्टूबर)' },
+      { m1: 'कार्तिक', m2: 'मार्गशीर्ष', sub: '(नवंबर)' },
+      { m1: 'मार्गशीर्ष', m2: 'पौष', sub: '(दिसंबर)' }
+    ];
+    pair = janPairs[monthIndex];
+  }
+
+  const subStr = (style === 'panchang_greg' || style === 'panchang_chaitra') ? `<div style="font-size: 1.1rem; margin-top: 5px; color: #64748b; font-weight: 700;">${pair.sub}</div>` : '';
+
+  return `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%;">` +
+         `<span style="color: #b45309; font-weight: 900; background: #fef3c7; padding: 6px 16px; border-radius: 10px; border: 1px solid #fde68a; font-size: 1.63rem; display: inline-block;">${pair.m1}</span>` +
+         `<span style="color: #0369a1; font-weight: 900; background: #e0f2fe; padding: 6px 16px; border-radius: 10px; border: 1px solid #bae6fd; font-size: 1.63rem; display: inline-block;">${pair.m2}</span>` +
+         subStr +
+         `</div>`;
+}
+
+function get1ColSubMonthName(monthIndex) {
+  if (!isHindiCalendar) {
+    return '';
+  }
+  
+  const styleEl = document.getElementById('hindiMonthStyle');
+  const style = styleEl ? styleEl.value : 'panchang_chaitra';
+  
+  if (style === 'panchang_chaitra') {
+    const subs = [
+      '(मार्च - अप्रैल)',
+      '(अप्रैल - मई)',
+      '(मई - जून)',
+      '(जून - जुलाई)',
+      '(जुलाई - अगस्त)',
+      '(अगस्त - सितंबर)',
+      '(सितंबर - अक्टूबर)',
+      '(अक्टूबर - नवंबर)',
+      '(नवंबर - दिसंबर)',
+      '(दिसंबर - जनवरी)',
+      '(जनवरी - फरवरी)',
+      '(फरवरी - मार्च)'
+    ];
+    return subs[monthIndex];
+  } else if (style === 'panchang' || style === 'panchang_greg') {
+    return `(${MONTHS_HI[monthIndex]})`;
+  }
+  return '';
+}
+
+function getDayPanchangStyle(day, isSunday = false, isToday = false, isHighlighted = false, highlightColor = '#ef4444') {
+  if (!isHindiCalendar) return '';
+  const colorPanchang = document.getElementById('colorPanchangDays');
+  if (colorPanchang && !colorPanchang.checked) return '';
+  if (isToday) return '';
+
+  if (day <= 15) {
+    const numColor = isHighlighted ? `color: ${highlightColor} !important;` : (isSunday ? 'color: #ef4444 !important;' : 'color: #b45309 !important;');
+    return `background-color: #fffbeb !important; border: 1px solid #fde68a !important; ${numColor}`;
+  } else {
+    const numColor = isHighlighted ? `color: ${highlightColor} !important;` : (isSunday ? 'color: #ef4444 !important;' : 'color: #0369a1 !important;');
+    return `background-color: #f0f9ff !important; border: 1px solid #bae6fd !important; ${numColor}`;
+  }
+}
+
+function getDayName(dayIndex, isSingleChar = false) {
+  if (isHindiCalendar) {
+    if (isSingleChar) {
+      const singleChars = ['र', 'सो', 'म', 'बु', 'गु', 'शु', 'श'];
+      return singleChars[dayIndex % 7];
+    }
+    return DAYS_SHORT_HI[dayIndex % 7];
+  }
+  const dayStr = DAYS_FULL_EN[dayIndex % 7];
+  return isSingleChar ? dayStr.charAt(0) : dayStr;
+}
+
+function toggleHindiCalendar() {
+  isHindiCalendar = !isHindiCalendar;
+  const btn = document.getElementById('hindiCalBtn');
+  const calTitleInput = document.getElementById('calTitle');
+
+  if (isHindiCalendar) {
+    if (btn) {
+      btn.innerHTML = '✅ Hindi Calendar Active (हिंदी कैलेंडर सक्रिय)';
+      btn.style.background = 'linear-gradient(135deg, #059669, #10b981)';
+      btn.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+    }
+    if (calTitleInput && (!calTitleInput.value || calTitleInput.value === `My Calendar ${document.getElementById('yearSelect').value}` || calTitleInput.value === `Calendar ${document.getElementById('yearSelect').value}`)) {
+      calTitleInput.value = `हिंदी कैलेंडर ${document.getElementById('yearSelect').value}`;
+    }
+  } else {
+    if (btn) {
+      btn.innerHTML = '🕉️ Enable Hindi Calendar (हिंदी कैलेंडर)';
+      btn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+      btn.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)';
+    }
+    if (calTitleInput && calTitleInput.value.includes('हिंदी कैलेंडर')) {
+      calTitleInput.value = `Calendar ${document.getElementById('yearSelect').value}`;
+    }
+  }
+  renderPreview();
+}
 
 const MONTH_QUOTES = [
   "बीता चाहे कितना भी कठिन क्यों न हो, आप हमेशा नए सिरे से शुरुआत कर सकते हैं।",
@@ -185,12 +477,12 @@ function renderMonthHTML(year, month, startDay, theme, is4Col = false) {
 
   const dayHeaders = [];
   for (let i = 0; i < 7; i++) {
-    const dayStr = DAYS_FULL[(i + startDay) % 7];
-    dayHeaders.push(is4Col ? dayStr.charAt(0) : dayStr);
+    const dayStr = getDayName((i + startDay) % 7, is4Col);
+    dayHeaders.push(dayStr);
   }
 
   let html = `<div class="month-block">
-    <div class="month-title" style="background:${theme.primary}; color: var(--theme-text, white);">${MONTHS[month]}</div>
+    <div class="month-title" style="background:${theme.primary}; color: var(--theme-text, white);">${getMonthHeaderHTML(month)}</div>
     <table class="month-table"><thead><tr>`;
 
   dayHeaders.forEach((d, i) => {
@@ -207,16 +499,17 @@ function renderMonthHTML(year, month, startDay, theme, is4Col = false) {
     const dayOfWeek = (firstDay + day - 1) % 7;
     let cls = '';
     if (dayOfWeek === 0) cls = 'sunday';
-    if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
-      cls = 'today';
-    }
+    const showToday = document.getElementById('showTodayHighlight') ? document.getElementById('showTodayHighlight').checked : false;
+    let isToday = showToday && (year === today.getFullYear() && month === today.getMonth() && day === today.getDate());
+    if (isToday) cls = 'today';
     
-    let styleStr = '';
-    if (highlightDates.includes(day)) {
+    const panchangStyle = getDayPanchangStyle(day, dayOfWeek === 0, isToday, highlightDates.includes(day), highlightColor);
+    let styleStr = panchangStyle || '';
+    if (!panchangStyle && highlightDates.includes(day)) {
       styleStr = `color: ${highlightColor} !important; font-weight: bold;`;
     }
     
-    html += `<td class="${cls}" style="${styleStr}">${day}</td>`;
+    html += `<td class="${cls}" style="${styleStr}">${formatNumber(day)}</td>`;
     if (dayOfWeek === 6 && day < daysInMonth) html += `</tr><tr>`;
   }
 
@@ -237,16 +530,30 @@ function renderSingleMonthPageHTML(year, month, startDay, theme) {
 
   const dayHeaders = [];
   for (let i = 0; i < 7; i++) {
-    dayHeaders.push(DAYS_FULL[(i + startDay) % 7]);
+    const dIdx = (i + startDay) % 7;
+    if (isHindiCalendar) {
+      dayHeaders.push(DAYS_FULL_HI[dIdx]);
+    } else {
+      dayHeaders.push(DAYS_FULL_EN[dIdx]);
+    }
   }
 
   const imgHtmlBefore = headerImageSrcBefore ? `<img src="${headerImageSrcBefore}" style="height: 1.2em; vertical-align: middle; margin: 0 15px;" />` : '';
   const imgHtmlAfter = headerImageSrcAfter ? `<img src="${headerImageSrcAfter}" style="height: 1.2em; vertical-align: middle; margin: 0 15px;" />` : '';
 
+  const mName = getMonthName(month);
+  const mStyle = getMonthNameStyle(mName, 3.25);
+  const headerHtml = getMonthHeaderHTML(month, true);
+  const subMonthName = get1ColSubMonthName(month);
+  const subMonthHtml = subMonthName ? `<div style="font-size: 0.45em; margin-top: 6px; color: #64748b; font-weight: 700; text-align: center; width: 100%;">${subMonthName}</div>` : '';
+
   let html = `<div class="single-month-page">
     <div class="big-header" style="background: linear-gradient(135deg, ${theme.primary}, ${theme.secondary}); display: flex; justify-content: space-between; align-items: center;">
-      <div class="month-name" style="display: flex; align-items: center;">
-        ${imgHtmlBefore}<span>${MONTHS[month]}</span>${imgHtmlAfter}
+      <div class="month-name" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; ${mStyle}">
+        <div style="display: flex; align-items: center; justify-content: center; width: 100%;">
+          ${imgHtmlBefore}<span>${headerHtml}</span>${imgHtmlAfter}
+        </div>
+        ${subMonthHtml}
       </div>
       <div class="year-text" style="display: flex; align-items: center;">${year}${yearImageSrc ? `<img src="${yearImageSrc}" style="height: 1.2em; vertical-align: middle; margin-left: 15px;" />` : ''}</div>
     </div>
@@ -267,20 +574,21 @@ function renderSingleMonthPageHTML(year, month, startDay, theme) {
     const dayOfWeek = (firstDay + day - 1) % 7;
     let cls = '';
     if (dayOfWeek === 0) cls = 'sunday';
-    if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
-      cls = 'today';
-    }
+    const showToday = document.getElementById('showTodayHighlight') ? document.getElementById('showTodayHighlight').checked : false;
+    let isToday = showToday && (year === today.getFullYear() && month === today.getMonth() && day === today.getDate());
+    if (isToday) cls = 'today';
     
     const highlightInput = document.getElementById('highlightDateNum').value;
     const highlightColor = document.getElementById('highlightDateColor').value;
     const highlightDates = highlightInput.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d));
     
-    let styleStr = '';
-    if (highlightDates.includes(day)) {
+    const panchangStyle = getDayPanchangStyle(day, dayOfWeek === 0, isToday, highlightDates.includes(day), highlightColor);
+    let styleStr = panchangStyle || '';
+    if (!panchangStyle && highlightDates.includes(day)) {
       styleStr = `color: ${highlightColor} !important;`;
     }
     
-    html += `<div class="day-cell ${cls}"><span class="day-num" style="${styleStr}">${day}</span></div>`;
+    html += `<div class="day-cell ${cls}" style="${panchangStyle}"><span class="day-num" style="${styleStr}">${formatNumber(day)}</span></div>`;
   }
 
   // Fill remaining cells to complete 6 rows (42 total)
@@ -331,12 +639,15 @@ function renderLandscapeMonthPageHTML(year, month, startDay, theme) {
   
   const yearImgHtml = yearImageSrc ? `<img src="${yearImageSrc}" style="height: 0.8em; vertical-align: middle; margin-left: 10px;" />` : '';
 
+  const mNameLandscape = getMonthName(month, true);
+  const mStyleLandscape = getMonthNameStyle(mNameLandscape, 3.5);
+
   // Left Sidebar
   html += `<div class="landscape-sidebar" style="border: 2px solid ${borderColor};">
       <div class="ls-top">
          <div class="ls-year" style="color: ${titleColor};">${year}${yearImgHtml}</div>
       </div>
-      <div class="ls-month-name" style="color: ${monthTitleColor};">${MONTHS[month].substring(0,3).toUpperCase()}</div>
+      <div class="ls-month-name" style="color: ${monthTitleColor};">${getLandscapeMonthHeaderHTML(month)}</div>
       ${sidebarMonthImageSrc ? `<div style="text-align: center; margin-bottom: 20px;"><img src="${sidebarMonthImageSrc}" style="max-width: 100%; max-height: 150px; border-radius: 8px;" /></div>` : ''}
       <div class="ls-notes">${finalEditorContent}</div>
   </div>`;
@@ -352,7 +663,7 @@ function renderLandscapeMonthPageHTML(year, month, startDay, theme) {
     let headerText = isSunday ? '#ffffff' : textColor;
     
     html += `<div class="ls-col" style="border-right: 1px solid ${borderColor}; background: transparent; --dot-color: ${borderColor};">`;
-    html += `<div class="ls-col-header" style="background: ${headerColor}; color: ${headerText};">${DAYS_FULL[dayIndex].toUpperCase()}</div>`;
+    html += `<div class="ls-col-header" style="background: ${headerColor}; color: ${headerText};">${getDayName(dayIndex).toUpperCase()}</div>`;
     
     const highlightInput = document.getElementById('highlightDateNum').value;
     const highlightColor = document.getElementById('highlightDateColor').value;
@@ -368,10 +679,12 @@ function renderLandscapeMonthPageHTML(year, month, startDay, theme) {
              color = highlightColor;
           }
           
-          let isToday = (year === today.getFullYear() && month === today.getMonth() && dayNum === today.getDate());
-          let extraStyle = isToday ? `background: linear-gradient(135deg, ${theme.primary}, ${theme.secondary || theme.primary}); color: white; border-radius: 12px; transform: scale(0.95);` : `color: ${color};`;
+          const showToday = document.getElementById('showTodayHighlight') ? document.getElementById('showTodayHighlight').checked : false;
+          let isToday = showToday && (year === today.getFullYear() && month === today.getMonth() && dayNum === today.getDate());
+          const panchangStyle = getDayPanchangStyle(dayNum, isSunday, isToday, highlightDates.includes(dayNum), highlightColor);
+          let extraStyle = panchangStyle || (isToday ? `background: linear-gradient(135deg, ${theme.primary}, ${theme.secondary || theme.primary}); color: white; border-radius: 12px; transform: scale(0.95);` : `color: ${color};`);
           
-          html += `<div class="ls-cell" style="${extraStyle}"><span class="ls-day-num">${dayNum}</span></div>`;
+          html += `<div class="ls-cell" style="${extraStyle}"><span class="ls-day-num">${formatNumber(dayNum)}</span></div>`;
        } else {
           html += `<div class="ls-cell empty"></div>`;
        }
@@ -420,7 +733,7 @@ function renderPreview() {
   if (currentTemplate.cols === -1) {
     preview.className = `calendar-page landscape page-${format}`;
     preview.innerHTML = renderLandscapeMonthPageHTML(year, previewMonthIndex, startDay, currentTheme);
-    indicator.textContent = `Page ${previewMonthIndex + 1} of 12 — ${MONTHS[previewMonthIndex]} ${year}`;
+    indicator.textContent = `Page ${previewMonthIndex + 1} of 12 — ${getMonthName(previewMonthIndex)} ${year}`;
     navButtons.style.display = 'flex';
     if (btnGenerateAll) btnGenerateAll.style.display = 'block';
     document.getElementById('prevMonthBtn').disabled = previewMonthIndex === 0;
@@ -437,7 +750,7 @@ function renderPreview() {
     } else {
       preview.innerHTML = renderSingleMonthPageHTML(year, previewMonthIndex, startDay, currentTheme);
     }
-    indicator.textContent = `Page ${previewMonthIndex + 1} of 12 — ${MONTHS[previewMonthIndex]} ${year}`;
+    indicator.textContent = `Page ${previewMonthIndex + 1} of 12 — ${getMonthName(previewMonthIndex)} ${year}`;
     navButtons.style.display = 'flex';
     if (btnGenerateAll) btnGenerateAll.style.display = 'block';
     document.getElementById('prevMonthBtn').disabled = previewMonthIndex === 0;
@@ -735,14 +1048,18 @@ function renderNew1ColMonthPageHTML(year, month, startDay, theme) {
   }
 
   const monthNumStr = (month + 1).toString().padStart(2, '0');
-  const monthNameStr = MONTHS[month].toUpperCase();
+  const monthNameStr = getMonthName(month);
+  const mStyle1Col = getMonthNameStyle(monthNameStr, 6.46);
+  const subMonthName = get1ColSubMonthName(month);
+  const subMonthHtml = subMonthName ? `<div class="t1-month-sub">${subMonthName}</div>` : '';
   
   let html = `<div class="tpl-1col-new-page" style="--primary: ${theme.primary}; --light-bg: ${lightBg};">`;
   
   html += `
     <div class="t1-header">
       <div class="t1-header-left">
-        <div class="t1-month-name">${monthNameStr}</div>
+        <div class="t1-month-name" style="${mStyle1Col}">${getMonthHeaderHTML(month, true)}</div>
+        ${subMonthHtml}
       </div>
       <div class="t1-year">${year}</div>
     </div>
@@ -757,7 +1074,7 @@ function renderNew1ColMonthPageHTML(year, month, startDay, theme) {
   for (let r = 0; r < 7; r++) {
     const dayIndex = (r + startDay) % 7;
     const isSunday = dayIndex === 0;
-    const dayName = DAYS_FULL[dayIndex].substring(0,3).toUpperCase();
+    const dayName = getDayName(dayIndex);
     
     let dayLabelStyle = isSunday ? 'background: #ef4444; color: white;' : '';
     html += `<div class="t1-day-label ${isSunday ? 'sunday' : ''}" style="${dayLabelStyle}">${dayName}</div>`;
@@ -765,18 +1082,19 @@ function renderNew1ColMonthPageHTML(year, month, startDay, theme) {
     for (let w = 0; w < weeks.length; w++) {
       const dayNum = weeks[w][r];
       if (dayNum) {
-        let isToday = (year === today.getFullYear() && month === today.getMonth() && dayNum === today.getDate());
-        let styleStr = '';
-        let numStyle = isSunday ? 'color: #ef4444;' : '';
+        const showToday = document.getElementById('showTodayHighlight') ? document.getElementById('showTodayHighlight').checked : false;
+        let isToday = showToday && (year === today.getFullYear() && month === today.getMonth() && dayNum === today.getDate());
+        const panchangStyle = getDayPanchangStyle(dayNum, isSunday, isToday, highlightDates.includes(dayNum), highlightColor);
+        let styleStr = panchangStyle || (isToday ? `background: var(--primary); color: white;` : '');
+        let numStyle = isSunday && !panchangStyle ? 'color: #ef4444;' : '';
         if (isToday) {
-           styleStr = `background: var(--primary); color: white;`;
            numStyle = 'color: white;';
         }
-        if (highlightDates.includes(dayNum)) {
+        if (highlightDates.includes(dayNum) && !panchangStyle) {
            numStyle = `color: ${highlightColor};`;
         }
         html += `<div class="t1-day-cell ${isSunday ? 'sunday' : ''}" style="${styleStr}">
-                   <div class="t1-day-num" style="${numStyle}">${dayNum}</div>
+                   <div class="t1-day-num" style="${numStyle}">${formatNumber(dayNum)}</div>
                  </div>`;
       } else {
         html += `<div class="t1-day-cell empty"></div>`;
@@ -814,18 +1132,36 @@ function renderNew1ColMonthPageHTML(year, month, startDay, theme) {
   return html;
 }
 
+function getMiniCalHeaderHTML(monthIndex, year) {
+  if (!isHindiCalendar) {
+    return `${getMonthName(monthIndex, true)} ${year}`;
+  }
+  
+  const styleEl = document.getElementById('hindiMonthStyle');
+  const style = styleEl ? styleEl.value : 'panchang_chaitra';
+  
+  if (style === 'panchang_chaitra') {
+    const miniNames = ['१. चैत्र-वैशाख', '२. वैशाख-ज्येष्ठ', '३. ज्येष्ठ-आषाढ़', '४. आषाढ़-श्रावण', '५. श्रावण-भाद्रपद', '६. भाद्रपद-आश्विन', '७. आश्विन-कार्तिक', '८. कार्तिक-मार्गशीर्ष', '९. मार्गशीर्ष-पौष', '१०. पौष-माघ', '११. माघ-फाल्गुन', '१२. फाल्गुन-चैत्र'];
+    return miniNames[monthIndex];
+  } else if (style === 'panchang' || style === 'panchang_greg') {
+    return MONTHS_PANCHANG[monthIndex];
+  } else {
+    return MONTHS_HI[monthIndex];
+  }
+}
+
 function renderMiniCal(year, month, startDay, theme) {
   const daysInMonth = getDaysInMonth(year, month);
   const firstDay = getFirstDayOfMonth(year, month, startDay);
   
   let html = `<div class="mini-cal-wrapper">`;
-  html += `<div class="mini-cal-title">${MONTHS[month].toUpperCase()} ${year}</div>`;
+  html += `<div class="mini-cal-title">${getMiniCalHeaderHTML(month, year)}</div>`;
   
   html += `<div class="mini-cal-grid">`;
   for (let i = 0; i < 7; i++) {
     const dayIndex = (i + startDay) % 7;
     const isSunday = dayIndex === 0;
-    html += `<div class="mini-cal-th ${isSunday ? 'sunday' : ''}">${DAYS_FULL[dayIndex].substring(0,3).toUpperCase()}</div>`;
+    html += `<div class="mini-cal-th ${isSunday ? 'sunday' : ''}">${getDayName(dayIndex)}</div>`;
   }
   
   for (let i = 0; i < firstDay; i++) {
@@ -834,7 +1170,8 @@ function renderMiniCal(year, month, startDay, theme) {
   for (let day = 1; day <= daysInMonth; day++) {
     const dayIndex = (firstDay + day - 1) % 7;
     const isSunday = dayIndex === 0;
-    html += `<div class="mini-cal-td ${isSunday ? 'sunday' : ''}">${day}</div>`;
+    const panchangStyle = getDayPanchangStyle(day, isSunday, false, false);
+    html += `<div class="mini-cal-td ${isSunday ? 'sunday' : ''}" style="${panchangStyle}">${formatNumber(day)}</div>`;
   }
   const totalFilled = firstDay + daysInMonth;
   for (let i = totalFilled; i < 42; i++) {
