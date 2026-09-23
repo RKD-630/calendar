@@ -26,6 +26,7 @@ const MONTHS_EN = ['January','February','March','April','May','June',
                 'July','August','September','October','November','December'];
 const MONTHS_HI = ['जनवरी','फरवरी','मार्च','अप्रैल','मई','जून',
                 'जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'];
+const MONTHS = MONTHS_EN;
 
 const DAYS_FULL_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const DAYS_FULL_HI = ['रविवार','सोमवार','मंगलवार','बुधवार','गुरुवार','शुक्रवार','शनिवार'];
@@ -119,9 +120,9 @@ function getMonthNameStyle(monthStr, baseRem = 4.55) {
   return `font-size: ${fontRem.toFixed(2)}rem; white-space: nowrap; word-break: keep-all; line-height: 1.2; max-width: 100%; text-align: center; display: flex; justify-content: center; align-items: center;`;
 }
 
-function getMonthHeaderHTML(monthIndex, hideSub = false) {
+function getMonthHeaderHTML(monthIndex, hideSub = false, isCompact = false) {
   if (!isHindiCalendar) {
-    return getMonthName(monthIndex);
+    return getMonthName(monthIndex, isCompact);
   }
 
   const styleEl = document.getElementById('hindiMonthStyle');
@@ -130,7 +131,7 @@ function getMonthHeaderHTML(monthIndex, hideSub = false) {
   const isColoring = colorPanchang ? colorPanchang.checked : true;
 
   if (!isColoring || style === 'hindi_greg') {
-    return `<span style="color: #d97706; font-weight: 800;">${getMonthName(monthIndex)}</span>`;
+    return `<span style="color: #d97706; font-weight: 800;">${getMonthName(monthIndex, isCompact)}</span>`;
   }
 
   let pair;
@@ -168,17 +169,25 @@ function getMonthHeaderHTML(monthIndex, hideSub = false) {
     pair = janPairs[monthIndex];
   }
 
-  const subStr = (hideSub || style === 'panchang') ? '' : `<span style="font-size: 0.95em; margin-left: 6px; color: #64748b; font-weight: 600;">${pair.sub}</span>`;
+  if (isCompact) {
+    const subStr = (hideSub || style === 'panchang') ? '' : `<span style="font-size: 0.75em; margin-left: 3px; color: #64748b; font-weight: 600;">${pair.sub}</span>`;
+    return `<span style="color: #b45309; font-weight: 800; background: #fef3c7; padding: 1px 5px; border-radius: 4px; font-size: 0.85em; display: inline-block;">${pair.m1}</span>` +
+           `<span style="margin: 0 2px; color: #94a3b8; font-weight: 700;">-</span>` +
+           `<span style="color: #0369a1; font-weight: 800; background: #e0f2fe; padding: 1px 5px; border-radius: 4px; font-size: 0.85em; display: inline-block;">${pair.m2}</span>` +
+           subStr;
+  }
 
-  return `<span style="color: #b45309; font-weight: 900; background: #fef3c7; padding: 4px 10px; border-radius: 8px; border: 1px solid #fde68a; font-size: 1.15em;">${pair.m1}</span>` +
-         `<span style="margin: 0 6px; color: #94a3b8; font-weight: 700;">-</span>` +
-         `<span style="color: #0369a1; font-weight: 900; background: #e0f2fe; padding: 4px 10px; border-radius: 8px; border: 1px solid #bae6fd; font-size: 1.15em;">${pair.m2}</span>` +
+  const subStr = (hideSub || style === 'panchang') ? '' : `<span style="font-size: 0.85em; margin-left: 6px; color: #64748b; font-weight: 600;">${pair.sub}</span>`;
+
+  return `<span style="color: #b45309; font-weight: 800; background: #fef3c7; padding: 3px 8px; border-radius: 6px; box-shadow: inset 0 0 0 1px #fde68a; font-size: 0.95em;">${pair.m1}</span>` +
+         `<span style="margin: 0 5px; color: #94a3b8; font-weight: 700;">-</span>` +
+         `<span style="color: #0369a1; font-weight: 800; background: #e0f2fe; padding: 3px 8px; border-radius: 6px; box-shadow: inset 0 0 0 1px #bae6fd; font-size: 0.95em;">${pair.m2}</span>` +
          subStr;
 }
 
 function getLandscapeMonthHeaderHTML(monthIndex) {
   if (!isHindiCalendar) {
-    return `<span style="font-size: 2.34rem; font-weight: 800;">${getMonthName(monthIndex)}</span>`;
+    return `<span style="font-size: 1.6rem; font-weight: 800;">${getMonthName(monthIndex)}</span>`;
   }
 
   const styleEl = document.getElementById('hindiMonthStyle');
@@ -187,7 +196,7 @@ function getLandscapeMonthHeaderHTML(monthIndex) {
   const isColoring = colorPanchang ? colorPanchang.checked : true;
 
   if (!isColoring || style === 'hindi_greg') {
-    return `<span style="color: #d97706; font-weight: 800; font-size: 2.08rem;">${getMonthName(monthIndex)}</span>`;
+    return `<span style="color: #d97706; font-weight: 800; font-size: 1.4rem;">${getMonthName(monthIndex)}</span>`;
   }
 
   let pair;
@@ -225,11 +234,11 @@ function getLandscapeMonthHeaderHTML(monthIndex) {
     pair = janPairs[monthIndex];
   }
 
-  const subStr = (style === 'panchang_greg' || style === 'panchang_chaitra') ? `<div style="font-size: 1.1rem; margin-top: 5px; color: #64748b; font-weight: 700;">${pair.sub}</div>` : '';
+  const subStr = (style === 'panchang_greg' || style === 'panchang_chaitra') ? `<div style="font-size: 0.95rem; margin-top: 4px; color: #64748b; font-weight: 700;">${pair.sub}</div>` : '';
 
-  return `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%;">` +
-         `<span style="color: #b45309; font-weight: 900; background: #fef3c7; padding: 6px 16px; border-radius: 10px; border: 1px solid #fde68a; font-size: 1.63rem; display: inline-block;">${pair.m1}</span>` +
-         `<span style="color: #0369a1; font-weight: 900; background: #e0f2fe; padding: 6px 16px; border-radius: 10px; border: 1px solid #bae6fd; font-size: 1.63rem; display: inline-block;">${pair.m2}</span>` +
+  return `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 100%;">` +
+         `<span style="color: #b45309; font-weight: 800; background: #fef3c7; padding: 4px 12px; border-radius: 8px; box-shadow: inset 0 0 0 1px #fde68a; font-size: 1.15rem; display: inline-block;">${pair.m1}</span>` +
+         `<span style="color: #0369a1; font-weight: 800; background: #e0f2fe; padding: 4px 12px; border-radius: 8px; box-shadow: inset 0 0 0 1px #bae6fd; font-size: 1.15rem; display: inline-block;">${pair.m2}</span>` +
          subStr +
          `</div>`;
 }
@@ -264,18 +273,28 @@ function get1ColSubMonthName(monthIndex) {
   return '';
 }
 
-function getDayPanchangStyle(day, isSunday = false, isToday = false, isHighlighted = false, highlightColor = '#ef4444') {
+function getDayPanchangStyle(day, isSunday = false, isToday = false, isHighlighted = false, highlightColor = '#ef4444', isMini = false) {
   if (!isHindiCalendar) return '';
   const colorPanchang = document.getElementById('colorPanchangDays');
   if (colorPanchang && !colorPanchang.checked) return '';
   if (isToday) return '';
 
+  if (isMini) {
+    if (day <= 15) {
+      const numColor = isSunday ? 'color: #ef4444 !important;' : 'color: #b45309 !important;';
+      return `background-color: #fffbeb !important; ${numColor}`;
+    } else {
+      const numColor = isSunday ? 'color: #ef4444 !important;' : 'color: #0369a1 !important;';
+      return `background-color: #f0f9ff !important; ${numColor}`;
+    }
+  }
+
   if (day <= 15) {
     const numColor = isHighlighted ? `color: ${highlightColor} !important;` : (isSunday ? 'color: #ef4444 !important;' : 'color: #b45309 !important;');
-    return `background-color: #fffbeb !important; border: 1px solid #fde68a !important; ${numColor}`;
+    return `background-color: #fffbeb !important; box-shadow: inset 0 0 0 1px #fde68a !important; border-radius: 4px; ${numColor}`;
   } else {
     const numColor = isHighlighted ? `color: ${highlightColor} !important;` : (isSunday ? 'color: #ef4444 !important;' : 'color: #0369a1 !important;');
-    return `background-color: #f0f9ff !important; border: 1px solid #bae6fd !important; ${numColor}`;
+    return `background-color: #f0f9ff !important; box-shadow: inset 0 0 0 1px #bae6fd !important; border-radius: 4px; ${numColor}`;
   }
 }
 
@@ -294,6 +313,7 @@ function getDayName(dayIndex, isSingleChar = false) {
 function toggleHindiCalendar() {
   isHindiCalendar = !isHindiCalendar;
   const btn = document.getElementById('hindiCalBtn');
+  const mobileBtn = document.getElementById('mobileHindiBtn');
   const calTitleInput = document.getElementById('calTitle');
 
   if (isHindiCalendar) {
@@ -301,6 +321,15 @@ function toggleHindiCalendar() {
       btn.innerHTML = '✅ Hindi Calendar Active (हिंदी कैलेंडर सक्रिय)';
       btn.style.background = 'linear-gradient(135deg, #059669, #10b981)';
       btn.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+    }
+    if (mobileBtn) {
+      mobileBtn.classList.add('active');
+      const iconSpan = mobileBtn.querySelector('.act-icon');
+      if (iconSpan) iconSpan.textContent = '✅';
+      const labelSpan = mobileBtn.querySelector('.act-text-mobile');
+      if (labelSpan) labelSpan.textContent = 'Active';
+      mobileBtn.style.background = 'linear-gradient(135deg, #059669, #10b981)';
+      mobileBtn.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.4)';
     }
     if (calTitleInput && (!calTitleInput.value || calTitleInput.value === `My Calendar ${document.getElementById('yearSelect').value}` || calTitleInput.value === `Calendar ${document.getElementById('yearSelect').value}`)) {
       calTitleInput.value = `हिंदी कैलेंडर ${document.getElementById('yearSelect').value}`;
@@ -311,11 +340,87 @@ function toggleHindiCalendar() {
       btn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
       btn.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)';
     }
+    if (mobileBtn) {
+      mobileBtn.classList.remove('active');
+      const iconSpan = mobileBtn.querySelector('.act-icon');
+      if (iconSpan) iconSpan.textContent = '🕉️';
+      const labelSpan = mobileBtn.querySelector('.act-text-mobile');
+      if (labelSpan) labelSpan.textContent = 'Hindi';
+      mobileBtn.style.background = '';
+      mobileBtn.style.boxShadow = '';
+    }
     if (calTitleInput && calTitleInput.value.includes('हिंदी कैलेंडर')) {
       calTitleInput.value = `Calendar ${document.getElementById('yearSelect').value}`;
     }
   }
+  if (customMonthFestivals[previewMonthIndex] === undefined) {
+    updateFestivalInputs(getFestivalTextForMonth(previewMonthIndex));
+  }
   renderPreview();
+}
+
+const DEFAULT_FESTIVALS_EN = [
+  "14 Jan: Makar Sankranti / Pongal | 26 Jan: Republic Day",
+  "Vasant Panchami | Maha Shivratri",
+  "Holi / Dhulandi | Good Friday",
+  "Chaitra Navratri | Ram Navami | Mahavir Jayanti",
+  "Buddha Purnima | Eid-ul-Fitr",
+  "Bakrid (Eid-ul-Adha) | Kabir Jayanti",
+  "Guru Purnima | Muharram",
+  "15 Aug: Independence Day | Raksha Bandhan | Janmashtami",
+  "Ganesh Chaturthi | Milad-un-Nabi",
+  "2 Oct: Gandhi Jayanti | Dussehra / Vijayadashami",
+  "Diwali / Deepavali | Govardhan Puja | Bhai Dooj | Chhath Puja",
+  "25 Dec: Christmas"
+];
+
+const DEFAULT_FESTIVALS_HI = [
+  "१४ जन: मकर संक्रांति / पोंगल | २६ जन: गणतंत्र दिवस",
+  "वसंत पंचमी | महाशिवरात्रि",
+  "होली / धुलेंडी | गुड फ्राइडे",
+  "चैत्र नवरात्रि | राम नवमी | महावीर जयंती",
+  "बुद्ध पूर्णिमा | ईद-उल-फितर",
+  "बकरीद (ईद-उल-अजहा) | कबीर जयंती",
+  "गुरु पूर्णिमा | मोहर्रम",
+  "१५ अग: स्वतंत्रता दिवस | रक्षाबंधन | जन्माष्टमी",
+  "गणेश चतुर्थी | मिलाद-उन-नबी",
+  "२ अक्टू: गांधी जयंती | दशहरा / विजयादशमी",
+  "दीपावली / लक्ष्मी पूजा | गोवर्धन पूजा | भाई दूज | छठ पूजा",
+  "२५ दिस: क्रिसमस"
+];
+
+let customMonthFestivals = {};
+
+function getFestivalTextForMonth(monthIdx) {
+  if (customMonthFestivals[monthIdx] !== undefined) {
+    return customMonthFestivals[monthIdx];
+  }
+  const list = isHindiCalendar ? DEFAULT_FESTIVALS_HI : DEFAULT_FESTIVALS_EN;
+  return list[monthIdx] || '';
+}
+
+function updateFestivalInputs(val) {
+  const topInput = document.getElementById('festivalHolidayInput');
+  const sideInput = document.getElementById('festivalHolidayInputSidebar');
+  if (topInput && topInput.value !== val) topInput.value = val;
+  if (sideInput && sideInput.value !== val) sideInput.value = val;
+}
+
+function handleFestivalHolidayInput(e) {
+  const val = e.target.value;
+  customMonthFestivals[previewMonthIndex] = val;
+  updateFestivalInputs(val);
+  renderPreview();
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 const MONTH_QUOTES = [
@@ -340,6 +445,10 @@ let headerImageSrcBefore = null;
 let headerImageSrcAfter = null;
 let yearImageSrc = null;
 let sidebarMonthImageSrc = null;
+let notesImageSrc = null;
+let notesImageOpacity = 1;
+let notesImageHeight = 90;
+let notesImageWidth = 160;
 let currentImageTarget = 'headerImageSrcBefore';
 
 function selectImageTarget(target) {
@@ -358,6 +467,79 @@ function clearCurrentImage() {
   else if (currentImageTarget === 'headerImageSrcAfter') headerImageSrcAfter = null;
   else if (currentImageTarget === 'yearImageSrc') yearImageSrc = null;
   else if (currentImageTarget === 'sidebarMonthImageSrc') sidebarMonthImageSrc = null;
+  else if (currentImageTarget === 'notesImageSrc') clearNotesImage();
+  renderPreview();
+}
+
+function setNotesImageOpacity(val) {
+  notesImageOpacity = parseFloat(val);
+  const span = document.getElementById('notesImageOpacityVal');
+  if (span) span.textContent = `${Math.round(notesImageOpacity * 100)}%`;
+  const slider = document.getElementById('notesImageOpacity');
+  if (slider && slider.value !== String(val)) slider.value = val;
+  
+  // Realtime update for any images inside editorArea or preview
+  const imgs = document.querySelectorAll('#editorArea img, .notes-custom-img');
+  imgs.forEach(img => {
+    img.style.opacity = notesImageOpacity;
+  });
+  renderPreview();
+}
+
+function setNotesImageHeight(val) {
+  notesImageHeight = Math.max(20, Math.min(300, parseInt(val) || 90));
+  const span1 = document.getElementById('notesImageHeightVal');
+  if (span1) span1.textContent = `${notesImageHeight}px`;
+  const span2 = document.getElementById('sharedImageHeightVal');
+  if (span2) span2.textContent = `${notesImageHeight}px`;
+
+  const slider1 = document.getElementById('notesImageHeight');
+  if (slider1 && parseInt(slider1.value) !== notesImageHeight) slider1.value = notesImageHeight;
+  const slider2 = document.getElementById('sharedImageHeight');
+  if (slider2 && parseInt(slider2.value) !== notesImageHeight) slider2.value = notesImageHeight;
+
+  // Realtime update for any notes images in preview and editor
+  const imgs = document.querySelectorAll('#editorArea img, .notes-custom-img');
+  imgs.forEach(img => {
+    img.style.maxHeight = `${notesImageHeight}px`;
+  });
+  renderPreview();
+}
+
+function adjustNotesImageHeight(delta) {
+  setNotesImageHeight(notesImageHeight + delta);
+}
+
+function setNotesImageWidth(val) {
+  notesImageWidth = Math.max(20, Math.min(500, parseInt(val) || 160));
+  const span1 = document.getElementById('notesImageWidthVal');
+  if (span1) span1.textContent = `${notesImageWidth}px`;
+  const span2 = document.getElementById('sharedImageWidthVal');
+  if (span2) span2.textContent = `${notesImageWidth}px`;
+
+  const slider1 = document.getElementById('notesImageWidth');
+  if (slider1 && parseInt(slider1.value) !== notesImageWidth) slider1.value = notesImageWidth;
+  const slider2 = document.getElementById('sharedImageWidth');
+  if (slider2 && parseInt(slider2.value) !== notesImageWidth) slider2.value = notesImageWidth;
+
+  // Realtime update for any notes images in preview and editor
+  const imgs = document.querySelectorAll('#editorArea img, .notes-custom-img');
+  imgs.forEach(img => {
+    img.style.maxWidth = `${notesImageWidth}px`;
+  });
+  renderPreview();
+}
+
+function adjustNotesImageWidth(delta) {
+  setNotesImageWidth(notesImageWidth + delta);
+}
+
+function clearNotesImage() {
+  notesImageSrc = null;
+  const clearBtn = document.getElementById('clearNotesImgBtn');
+  if (clearBtn) clearBtn.style.display = 'none';
+  const customImgs = document.querySelectorAll('#editorArea .notes-custom-img-wrap');
+  customImgs.forEach(el => el.remove());
   renderPreview();
 }
 
@@ -376,6 +558,11 @@ function init() {
         else if (currentImageTarget === 'headerImageSrcAfter') headerImageSrcAfter = event.target.result;
         else if (currentImageTarget === 'yearImageSrc') yearImageSrc = event.target.result;
         else if (currentImageTarget === 'sidebarMonthImageSrc') sidebarMonthImageSrc = event.target.result;
+        else if (currentImageTarget === 'notesImageSrc') {
+          notesImageSrc = event.target.result;
+          const clearBtn = document.getElementById('clearNotesImgBtn');
+          if (clearBtn) clearBtn.style.display = 'inline-flex';
+        }
         renderPreview();
       };
       reader.readAsDataURL(file);
@@ -398,8 +585,80 @@ function init() {
   document.getElementById('fontFamily').addEventListener('change', function() {
     execCmdVal('fontName', this.value);
   });
-  document.getElementById('editorArea').addEventListener('input', renderPreview);
+  if (document.getElementById('editorArea')) {
+    document.getElementById('editorArea').addEventListener('input', renderPreview);
+  }
+  
+  const topFestInput = document.getElementById('festivalHolidayInput');
+  const sideFestInput = document.getElementById('festivalHolidayInputSidebar');
+  if (topFestInput) {
+    topFestInput.value = getFestivalTextForMonth(previewMonthIndex);
+    topFestInput.addEventListener('input', handleFestivalHolidayInput);
+  }
+  if (sideFestInput) {
+    sideFestInput.value = getFestivalTextForMonth(previewMonthIndex);
+    sideFestInput.addEventListener('input', handleFestivalHolidayInput);
+  }
+
+  const notesUpload = document.getElementById('notesImageUpload');
+  if (notesUpload) {
+    notesUpload.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          notesImageSrc = event.target.result;
+          const clearBtn = document.getElementById('clearNotesImgBtn');
+          if (clearBtn) clearBtn.style.display = 'inline-flex';
+          renderPreview();
+        };
+        reader.readAsDataURL(file);
+      }
+      this.value = '';
+    });
+  }
+
   window.addEventListener('resize', adjustMobileScale);
+
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('template')) {
+    const tIdx = parseInt(urlParams.get('template'));
+    if (TEMPLATES[tIdx]) {
+      currentTemplate = TEMPLATES[tIdx];
+      document.querySelectorAll('.template-card').forEach((c, idx) => {
+        c.classList.toggle('active', idx === tIdx);
+      });
+    }
+  }
+  if (urlParams.has('format')) {
+    const pf = document.getElementById('pageFormat');
+    if (pf) pf.value = urlParams.get('format');
+  }
+  if (urlParams.has('year')) {
+    const ys = document.getElementById('yearSelect');
+    if (ys) ys.value = urlParams.get('year');
+  }
+  if (urlParams.get('hindi') === '1' && !isHindiCalendar) {
+    toggleHindiCalendar();
+  }
+  if (urlParams.has('notesOpacity')) {
+    setNotesImageOpacity(urlParams.get('notesOpacity'));
+  }
+  if (urlParams.has('notesHeight')) {
+    setNotesImageHeight(urlParams.get('notesHeight'));
+  }
+  if (urlParams.has('notesWidth')) {
+    setNotesImageWidth(urlParams.get('notesWidth'));
+  }
+  if (urlParams.has('testNotesImg')) {
+    notesImageSrc = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'><rect width='200' height='120' rx='16' fill='%236366f1'/><circle cx='100' cy='60' r='36' fill='%23ffffff' opacity='0.9'/><text x='100' y='66' font-size='20' text-anchor='middle' fill='%236366f1' font-family='sans-serif' font-weight='bold'>LOGO</text></svg>";
+    const clearBtn = document.getElementById('clearNotesImgBtn');
+    if (clearBtn) clearBtn.style.display = 'inline-flex';
+  }
+  if (urlParams.has('tab') && typeof switchMobileTab === 'function') {
+    switchMobileTab(urlParams.get('tab'));
+  }
+  renderPreview();
 }
 
 function populateYears() {
@@ -466,7 +725,7 @@ function getFirstDayOfMonth(year, month, startDay) {
   return (d - startDay + 7) % 7;
 }
 
-function renderMonthHTML(year, month, startDay, theme, is4Col = false) {
+function renderMonthHTML(year, month, startDay, theme, is4Col = false, colCount = 2) {
   const daysInMonth = getDaysInMonth(year, month);
   const firstDay = getFirstDayOfMonth(year, month, startDay);
   const today = new Date();
@@ -475,14 +734,16 @@ function renderMonthHTML(year, month, startDay, theme, is4Col = false) {
   const highlightColor = document.getElementById('highlightDateColor').value;
   const highlightDates = highlightInput.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d));
 
+  const isCompactHeader = colCount >= 2;
+
   const dayHeaders = [];
   for (let i = 0; i < 7; i++) {
-    const dayStr = getDayName((i + startDay) % 7, is4Col);
+    const dayStr = getDayName((i + startDay) % 7, is4Col || colCount >= 3);
     dayHeaders.push(dayStr);
   }
 
   let html = `<div class="month-block">
-    <div class="month-title" style="background:${theme.primary}; color: var(--theme-text, white);">${getMonthHeaderHTML(month)}</div>
+    <div class="month-title" style="background:${theme.primary}; color: var(--theme-text, white);">${getMonthHeaderHTML(month, true, isCompactHeader)}</div>
     <table class="month-table"><thead><tr>`;
 
   dayHeaders.forEach((d, i) => {
@@ -492,9 +753,10 @@ function renderMonthHTML(year, month, startDay, theme, is4Col = false) {
   html += `</tr></thead><tbody><tr>`;
 
   for (let i = 0; i < firstDay; i++) {
-    html += `<td class="empty"></td>`;
+    html += `<td class="empty">&nbsp;</td>`;
   }
 
+  let rowCount = 1;
   for (let day = 1; day <= daysInMonth; day++) {
     const dayOfWeek = (firstDay + day - 1) % 7;
     let cls = '';
@@ -510,12 +772,26 @@ function renderMonthHTML(year, month, startDay, theme, is4Col = false) {
     }
     
     html += `<td class="${cls}" style="${styleStr}">${formatNumber(day)}</td>`;
-    if (dayOfWeek === 6 && day < daysInMonth) html += `</tr><tr>`;
+    if (dayOfWeek === 6 && day < daysInMonth) {
+      html += `</tr><tr>`;
+      rowCount++;
+    }
   }
 
   const lastDayOfWeek = (firstDay + daysInMonth - 1) % 7;
   for (let i = lastDayOfWeek + 1; i < 7; i++) {
-    html += `<td class="empty"></td>`;
+    html += `<td class="empty">&nbsp;</td>`;
+  }
+
+  // Ensure all month boxes in 4 Columns have uniform 6 rows so all 12 boxes are identical in size
+  if (is4Col) {
+    while (rowCount < 6) {
+      html += `</tr><tr>`;
+      for (let i = 0; i < 7; i++) {
+        html += `<td class="empty">&nbsp;</td>`;
+      }
+      rowCount++;
+    }
   }
 
   html += `</tr></tbody></table></div>`;
@@ -532,7 +808,7 @@ function renderSingleMonthPageHTML(year, month, startDay, theme) {
   for (let i = 0; i < 7; i++) {
     const dIdx = (i + startDay) % 7;
     if (isHindiCalendar) {
-      dayHeaders.push(DAYS_FULL_HI[dIdx]);
+      dayHeaders.push(DAYS_SHORT_HI[dIdx]);
     } else {
       dayHeaders.push(DAYS_FULL_EN[dIdx]);
     }
@@ -542,10 +818,10 @@ function renderSingleMonthPageHTML(year, month, startDay, theme) {
   const imgHtmlAfter = headerImageSrcAfter ? `<img src="${headerImageSrcAfter}" style="height: 1.2em; vertical-align: middle; margin: 0 15px;" />` : '';
 
   const mName = getMonthName(month);
-  const mStyle = getMonthNameStyle(mName, 3.25);
+  const mStyle = getMonthNameStyle(mName, 2.2);
   const headerHtml = getMonthHeaderHTML(month, true);
   const subMonthName = get1ColSubMonthName(month);
-  const subMonthHtml = subMonthName ? `<div style="font-size: 0.45em; margin-top: 6px; color: #64748b; font-weight: 700; text-align: center; width: 100%;">${subMonthName}</div>` : '';
+  const subMonthHtml = subMonthName ? `<div style="font-size: 0.45em; margin-top: 6px; color: rgba(255, 255, 255, 0.92); font-weight: 700; text-align: center; width: 100%; text-shadow: 0 1px 3px rgba(0,0,0,0.3);">${subMonthName}</div>` : '';
 
   let html = `<div class="single-month-page">
     <div class="big-header" style="background: linear-gradient(135deg, ${theme.primary}, ${theme.secondary}); display: flex; justify-content: space-between; align-items: center;">
@@ -608,8 +884,13 @@ function renderSingleMonthPageHTML(year, month, startDay, theme) {
     finalEditorContent = `<p style="text-align:center; color:#64748b;">${MONTH_QUOTES[month]}</p>`;
   }
 
-  if (plainText) {
-    html += `<div class="notes-area"><strong>📝 Notes:</strong><br>${finalEditorContent}</div>`;
+  const hasNotesImg = !!notesImageSrc;
+  if (plainText || hasNotesImg) {
+    html += `<div class="notes-area">
+      <strong>📝 ${isHindiCalendar ? 'टिप्पणी / पंचांग विवरण:' : 'Notes:'}</strong><br>
+      ${hasNotesImg ? `<div class="notes-img-box" style="text-align: center; margin: 4px 0;"><img src="${notesImageSrc}" class="notes-custom-img" style="max-width: min(100%, ${notesImageWidth}px); max-height: ${notesImageHeight}px; width: auto; object-fit: contain; border-radius: 6px; opacity: ${notesImageOpacity}; transition: opacity 0.18s, max-height 0.18s, max-width 0.18s;" /></div>` : ''}
+      ${finalEditorContent}
+    </div>`;
   }
 
   html += `</div>`;
@@ -640,7 +921,21 @@ function renderLandscapeMonthPageHTML(year, month, startDay, theme) {
   const yearImgHtml = yearImageSrc ? `<img src="${yearImageSrc}" style="height: 0.8em; vertical-align: middle; margin-left: 10px;" />` : '';
 
   const mNameLandscape = getMonthName(month, true);
-  const mStyleLandscape = getMonthNameStyle(mNameLandscape, 3.5);
+  const mStyleLandscape = getMonthNameStyle(mNameLandscape, 2.0);
+
+  const holidayText = getFestivalTextForMonth(month);
+  let holidayHtml = '';
+  if (holidayText && holidayText.trim()) {
+    const holidayTitle = isHindiCalendar ? 'त्यौहार एवं अवकाश' : 'Festivals & Holidays';
+    holidayHtml = `
+      <div class="ls-holidays" style="border: 1.5px dashed ${borderColor}; background: rgba(0,0,0,0.02);">
+        <div class="ls-holidays-title" style="color: ${monthTitleColor};">
+          <span>🎉</span> <span>${holidayTitle}</span>
+        </div>
+        <div class="ls-holidays-text">${escapeHtml(holidayText.trim())}</div>
+      </div>
+    `;
+  }
 
   // Left Sidebar
   html += `<div class="landscape-sidebar" style="border: 2px solid ${borderColor};">
@@ -649,7 +944,11 @@ function renderLandscapeMonthPageHTML(year, month, startDay, theme) {
       </div>
       <div class="ls-month-name" style="color: ${monthTitleColor};">${getLandscapeMonthHeaderHTML(month)}</div>
       ${sidebarMonthImageSrc ? `<div style="text-align: center; margin-bottom: 20px;"><img src="${sidebarMonthImageSrc}" style="max-width: 100%; max-height: 150px; border-radius: 8px;" /></div>` : ''}
-      <div class="ls-notes">${finalEditorContent}</div>
+      <div class="ls-notes">
+        ${notesImageSrc ? `<div class="notes-img-box" style="text-align: center; margin-bottom: 8px;"><img src="${notesImageSrc}" class="notes-custom-img" style="max-width: min(100%, ${notesImageWidth}px); max-height: ${notesImageHeight}px; width: auto; object-fit: contain; border-radius: 6px; opacity: ${notesImageOpacity}; transition: opacity 0.18s, max-height 0.18s, max-width 0.18s;" /></div>` : ''}
+        ${finalEditorContent}
+      </div>
+      ${holidayHtml}
   </div>`;
   
   // Grid
@@ -682,7 +981,7 @@ function renderLandscapeMonthPageHTML(year, month, startDay, theme) {
           const showToday = document.getElementById('showTodayHighlight') ? document.getElementById('showTodayHighlight').checked : false;
           let isToday = showToday && (year === today.getFullYear() && month === today.getMonth() && dayNum === today.getDate());
           const panchangStyle = getDayPanchangStyle(dayNum, isSunday, isToday, highlightDates.includes(dayNum), highlightColor);
-          let extraStyle = panchangStyle || (isToday ? `background: linear-gradient(135deg, ${theme.primary}, ${theme.secondary || theme.primary}); color: white; border-radius: 12px; transform: scale(0.95);` : `color: ${color};`);
+          let extraStyle = panchangStyle || (isToday ? `background: linear-gradient(135deg, ${theme.primary}, ${theme.secondary || theme.primary}); color: white; border-radius: 8px;` : `color: ${color};`);
           
           html += `<div class="ls-cell" style="${extraStyle}"><span class="ls-day-num">${formatNumber(dayNum)}</span></div>`;
        } else {
@@ -773,14 +1072,20 @@ function renderPreview() {
     </div>
   `;
 
-  if (editorContent.replace(/<[^>]*>/g, '').trim()) {
-    html += `<div class="cal-user-text">${editorContent}</div>`;
+  const hasNotesImg = !!notesImageSrc;
+  const hasNotesText = !!editorContent.replace(/<[^>]*>/g, '').trim();
+  if (hasNotesImg || hasNotesText) {
+    html += `<div class="cal-user-text">
+      ${hasNotesImg ? `<div class="notes-img-box" style="text-align: center; margin: 4px 0;"><img src="${notesImageSrc}" class="notes-custom-img" style="max-width: min(100%, ${notesImageWidth}px); max-height: ${notesImageHeight}px; width: auto; object-fit: contain; border-radius: 6px; opacity: ${notesImageOpacity}; transition: opacity 0.18s, max-height 0.18s, max-width 0.18s;" /></div>` : ''}
+      ${editorContent}
+    </div>`;
   }
 
-  const is4Col = currentTemplate.cols === 4;
+  const colCount = currentTemplate.cols;
+  const is4Col = colCount === 4;
   html += `<div class="cal-months-grid">`;
   for (let m = 0; m < 12; m++) {
-    html += renderMonthHTML(year, m, startDay, currentTheme, is4Col);
+    html += renderMonthHTML(year, m, startDay, currentTheme, is4Col, colCount);
   }
   html += `</div>`;
 
@@ -795,12 +1100,15 @@ function adjustMobileScale() {
   
   if (window.innerWidth <= 1024) {
     cal.style.transform = 'none';
+    cal.style.marginLeft = '0';
+    cal.style.marginRight = '0';
+    cal.style.marginBottom = '0';
     wrapper.style.height = 'auto';
     wrapper.style.justifyContent = 'flex-start';
     wrapper.style.overflow = 'hidden';
-    wrapper.style.padding = '0';
+    wrapper.style.padding = '0.5rem 0';
     
-    const wrapperWidth = wrapper.clientWidth;
+    const wrapperWidth = wrapper.clientWidth - 16;
     const calWidth = cal.offsetWidth;
     const calHeight = cal.offsetHeight;
     
@@ -808,13 +1116,21 @@ function adjustMobileScale() {
       let scale = wrapperWidth / calWidth;
       scale = Math.min(scale, 1);
       
-      cal.style.transform = `scale(${scale})`;
+      const scaledWidth = calWidth * scale;
+      const scaledHeight = calHeight * scale;
+      const marginLeft = Math.max(0, (wrapper.clientWidth - scaledWidth) / 2);
+      
       cal.style.transformOrigin = 'top left';
-      cal.style.marginBottom = '0';
-      wrapper.style.height = `${calHeight * scale}px`;
+      cal.style.transform = `scale(${scale})`;
+      cal.style.marginLeft = `${marginLeft}px`;
+      cal.style.marginRight = `-${calWidth - scaledWidth}px`;
+      cal.style.marginBottom = `-${calHeight - scaledHeight}px`;
+      wrapper.style.height = `${Math.ceil(scaledHeight + 16)}px`;
     }
   } else {
     cal.style.transform = 'none';
+    cal.style.marginLeft = '0';
+    cal.style.marginRight = '0';
     cal.style.marginBottom = '0';
     wrapper.style.height = 'auto';
     wrapper.style.justifyContent = 'center';
@@ -831,6 +1147,7 @@ function changePreviewMonth(delta) {
     const plainText = editorHtml.replace(/<[^>]*>/g, '').trim();
     
     previewMonthIndex = newIdx;
+    updateFestivalInputs(getFestivalTextForMonth(newIdx));
     
     if (!plainText || MONTH_QUOTES.includes(plainText) || plainText === 'Type your notes, holidays, events, or any custom text here...') {
        document.getElementById('editorArea').innerHTML = `<p style="text-align:center; color:#64748b;">${MONTH_QUOTES[newIdx]}</p>`;
@@ -853,10 +1170,12 @@ function execCmdVal(command, value) {
 // ===== PDF GENERATION =====
 async function generatePDF() {
   const btn = document.getElementById('btnGenerate');
+  const btnAll = document.getElementById('btnGenerateAll');
   const overlay = document.getElementById('loadingOverlay');
   const loadingText = document.getElementById('loadingText');
 
-  btn.disabled = true;
+  if (btn) btn.disabled = true;
+  if (btnAll) btnAll.disabled = true;
   overlay.classList.add('show');
   loadingText.textContent = 'Generating your PDF calendar...';
 
@@ -897,9 +1216,15 @@ async function generatePDF() {
 
     const previewEl = document.getElementById('calendarPreview');
     
-    // Temporarily disable transform for high-quality capture
+    // Temporarily disable transform and scaling margins for high-quality capture
     const originalTransform = previewEl.style.transform;
+    const originalMarginLeft = previewEl.style.marginLeft;
+    const originalMarginRight = previewEl.style.marginRight;
+    const originalMarginBottom = previewEl.style.marginBottom;
     previewEl.style.transform = 'none';
+    previewEl.style.marginLeft = '0';
+    previewEl.style.marginRight = '0';
+    previewEl.style.marginBottom = '0';
 
     // Capture the exact HTML element
     const canvas = await html2canvas(previewEl, {
@@ -909,13 +1234,18 @@ async function generatePDF() {
     });
 
     previewEl.style.transform = originalTransform;
+    previewEl.style.marginLeft = originalMarginLeft;
+    previewEl.style.marginRight = originalMarginRight;
+    previewEl.style.marginBottom = originalMarginBottom;
+    adjustMobileScale();
 
     const imgData = canvas.toDataURL('image/jpeg', 0.98);
     
     // Add image to fill the exact PDF page dimensions
     doc.addImage(imgData, 'JPEG', 0, 0, docW, docH);
 
-    const monthName = (currentTemplate.cols === 0 || currentTemplate.cols === -1) ? `_${MONTHS[previewMonthIndex]}` : '';
+    const isSingleMonthTemplate = currentTemplate.cols === 0 || currentTemplate.cols === -1 || currentTemplate.cols === 1;
+    const monthName = isSingleMonthTemplate ? `_${MONTHS_EN[previewMonthIndex]}` : '';
     doc.save(`Calendar_${year}${monthName}_${currentTheme.name}_${format.toUpperCase()}.pdf`);
     showToast();
 
@@ -923,7 +1253,8 @@ async function generatePDF() {
     console.error(err);
     alert('Error generating PDF: ' + err.message);
   } finally {
-    btn.disabled = false;
+    if (btn) btn.disabled = false;
+    if (btnAll) btnAll.disabled = false;
     overlay.classList.remove('show');
   }
 }
@@ -974,7 +1305,13 @@ async function generateAllMonthsPDF() {
 
     const previewEl = document.getElementById('calendarPreview');
     const originalTransform = previewEl.style.transform;
+    const originalMarginLeft = previewEl.style.marginLeft;
+    const originalMarginRight = previewEl.style.marginRight;
+    const originalMarginBottom = previewEl.style.marginBottom;
     previewEl.style.transform = 'none';
+    previewEl.style.marginLeft = '0';
+    previewEl.style.marginRight = '0';
+    previewEl.style.marginBottom = '0';
     
     const originalMonthIndex = previewMonthIndex;
 
@@ -1009,6 +1346,9 @@ async function generateAllMonthsPDF() {
     previewMonthIndex = originalMonthIndex;
     renderPreview();
     previewEl.style.transform = originalTransform;
+    previewEl.style.marginLeft = originalMarginLeft;
+    previewEl.style.marginRight = originalMarginRight;
+    previewEl.style.marginBottom = originalMarginBottom;
 
     doc.save(`Calendar_${year}_All_Months_${currentTheme.name}_${format.toUpperCase()}.pdf`);
     showToast();
@@ -1049,7 +1389,7 @@ function renderNew1ColMonthPageHTML(year, month, startDay, theme) {
 
   const monthNumStr = (month + 1).toString().padStart(2, '0');
   const monthNameStr = getMonthName(month);
-  const mStyle1Col = getMonthNameStyle(monthNameStr, 6.46);
+  const mStyle1Col = getMonthNameStyle(monthNameStr, 2.5);
   const subMonthName = get1ColSubMonthName(month);
   const subMonthHtml = subMonthName ? `<div class="t1-month-sub">${subMonthName}</div>` : '';
   
@@ -1161,7 +1501,7 @@ function renderMiniCal(year, month, startDay, theme) {
   for (let i = 0; i < 7; i++) {
     const dayIndex = (i + startDay) % 7;
     const isSunday = dayIndex === 0;
-    html += `<div class="mini-cal-th ${isSunday ? 'sunday' : ''}">${getDayName(dayIndex)}</div>`;
+    html += `<div class="mini-cal-th ${isSunday ? 'sunday' : ''}">${getDayName(dayIndex, true)}</div>`;
   }
   
   for (let i = 0; i < firstDay; i++) {
@@ -1170,7 +1510,7 @@ function renderMiniCal(year, month, startDay, theme) {
   for (let day = 1; day <= daysInMonth; day++) {
     const dayIndex = (firstDay + day - 1) % 7;
     const isSunday = dayIndex === 0;
-    const panchangStyle = getDayPanchangStyle(day, isSunday, false, false);
+    const panchangStyle = getDayPanchangStyle(day, isSunday, false, false, '#ef4444', true);
     html += `<div class="mini-cal-td ${isSunday ? 'sunday' : ''}" style="${panchangStyle}">${formatNumber(day)}</div>`;
   }
   const totalFilled = firstDay + daysInMonth;
