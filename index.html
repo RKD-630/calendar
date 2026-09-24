@@ -363,6 +363,56 @@
         </div>
         <h2 class="section-title">🎨 Choose Theme</h2>
         <div class="cards-scroll" id="themeContainer"></div>
+
+        <!-- Custom Theme Color Picker -->
+        <div id="customThemePanel" style="display:none; margin-top: 1rem; padding: 1rem; background: #f8fafc; border: 2px solid var(--border); border-radius: 12px; animation: fadeInDown 0.2s ease;">
+          <div style="font-size: 0.82rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">🎨 Customize Your Theme Colors</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
+            <div class="custom-color-row">
+              <label class="custom-color-label">Primary</label>
+              <div class="custom-color-input-wrap">
+                <input type="color" id="ct_primary" value="#4f46e5" oninput="applyCustomTheme()" class="custom-color-swatch">
+                <span id="ct_primary_hex" class="custom-color-hex">#4f46e5</span>
+              </div>
+            </div>
+            <div class="custom-color-row">
+              <label class="custom-color-label">Secondary</label>
+              <div class="custom-color-input-wrap">
+                <input type="color" id="ct_secondary" value="#818cf8" oninput="applyCustomTheme()" class="custom-color-swatch">
+                <span id="ct_secondary_hex" class="custom-color-hex">#818cf8</span>
+              </div>
+            </div>
+            <div class="custom-color-row">
+              <label class="custom-color-label">Background</label>
+              <div class="custom-color-input-wrap">
+                <input type="color" id="ct_bg" value="#eef2ff" oninput="applyCustomTheme()" class="custom-color-swatch">
+                <span id="ct_bg_hex" class="custom-color-hex">#eef2ff</span>
+              </div>
+            </div>
+            <div class="custom-color-row">
+              <label class="custom-color-label">Accent</label>
+              <div class="custom-color-input-wrap">
+                <input type="color" id="ct_accent" value="#c7d2fe" oninput="applyCustomTheme()" class="custom-color-swatch">
+                <span id="ct_accent_hex" class="custom-color-hex">#c7d2fe</span>
+              </div>
+            </div>
+            <div class="custom-color-row">
+              <label class="custom-color-label">Header Text</label>
+              <div class="custom-color-input-wrap">
+                <input type="color" id="ct_text" value="#ffffff" oninput="applyCustomTheme()" class="custom-color-swatch">
+                <span id="ct_text_hex" class="custom-color-hex">#ffffff</span>
+              </div>
+            </div>
+            <div class="custom-color-row">
+              <label class="custom-color-label">Border</label>
+              <div class="custom-color-input-wrap">
+                <input type="color" id="ct_border" value="#c7d2fe" oninput="applyCustomTheme()" class="custom-color-swatch">
+                <span id="ct_border_hex" class="custom-color-hex">#c7d2fe</span>
+              </div>
+            </div>
+          </div>
+          <button type="button" onclick="resetCustomTheme()" style="margin-top: 0.75rem; width: 100%; padding: 0.45rem; border: 1.5px solid var(--border); border-radius: 8px; background: white; font-size: 0.8rem; font-weight: 700; color: var(--text-light); cursor: pointer; transition: all 0.2s;">↺ Reset to Default</button>
+        </div>
       </div>
     </div>
   </div>

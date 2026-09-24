@@ -688,11 +688,80 @@ function renderThemes() {
       document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
       card.classList.add('active');
       currentTheme = t;
+      // Hide custom panel when a preset theme is chosen
+      const panel = document.getElementById('customThemePanel');
+      if (panel) panel.style.display = 'none';
       renderPreview();
     };
     container.appendChild(card);
   });
+
+  // --- Custom Theme Card ---
+  const customCard = document.createElement('div');
+  customCard.className = 'theme-card theme-card-custom';
+  customCard.id = 'customThemeCard';
+  customCard.innerHTML = `
+    <div class="theme-preview"></div>
+    <span>✨ Custom</span>
+  `;
+  customCard.onclick = () => {
+    document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+    customCard.classList.add('active');
+    const panel = document.getElementById('customThemePanel');
+    if (panel) {
+      panel.style.display = 'block';
+      // Trigger re-animation
+      panel.style.animation = 'none';
+      void panel.offsetWidth;
+      panel.style.animation = 'fadeInDown 0.22s ease';
+    }
+    applyCustomTheme();
+  };
+  container.appendChild(customCard);
 }
+
+// Build a theme object from the color pickers and apply it
+function applyCustomTheme() {
+  const fields = ['primary','secondary','bg','accent','text','border'];
+  const vals = {};
+  fields.forEach(f => {
+    const el = document.getElementById(`ct_${f}`);
+    const hexEl = document.getElementById(`ct_${f}_hex`);
+    if (el) {
+      vals[f] = el.value;
+      if (hexEl) hexEl.textContent = el.value;
+    }
+  });
+  currentTheme = {
+    name: 'Custom',
+    primary:   vals.primary   || '#4f46e5',
+    secondary: vals.secondary || '#818cf8',
+    bg:        vals.bg        || '#eef2ff',
+    accent:    vals.accent    || '#c7d2fe',
+    text:      vals.text      || '#ffffff',
+    border:    vals.border    || '#c7d2fe',
+  };
+  renderPreview();
+}
+
+// Reset color pickers to the Indigo defaults
+function resetCustomTheme() {
+  const defaults = {
+    primary:   '#4f46e5',
+    secondary: '#818cf8',
+    bg:        '#eef2ff',
+    accent:    '#c7d2fe',
+    text:      '#ffffff',
+    border:    '#c7d2fe',
+  };
+  Object.keys(defaults).forEach(f => {
+    const el = document.getElementById(`ct_${f}`);
+    const hexEl = document.getElementById(`ct_${f}_hex`);
+    if (el) { el.value = defaults[f]; if (hexEl) hexEl.textContent = defaults[f]; }
+  });
+  applyCustomTheme();
+}
+
 
 function renderTemplates() {
   const container = document.getElementById('templateContainer');
