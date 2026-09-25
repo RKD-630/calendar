@@ -31,10 +31,6 @@
   <div class="toast" id="toast">✅ PDF Downloaded Successfully!</div>
 
   <div class="topbar-controls" id="settingsPanel">
-    <div class="mobile-drawer-header">
-      <span>⚙️ Calendar Settings</span>
-      <button type="button" class="drawer-close-btn" onclick="switchMobileTab('none')">✕ Close</button>
-    </div>
     <div class="topbar-inner">
       <div class="control-group">
         <label>📆 Select Year</label>
@@ -86,10 +82,6 @@
 
     <div class="sidebar-controls">
       <div class="control-panel" id="hindiCalendarPanel">
-        <div class="mobile-drawer-header">
-          <span>🕉️ Hindi Panchang Settings</span>
-          <button type="button" class="drawer-close-btn" onclick="switchMobileTab('none')">✕ Close</button>
-        </div>
         <h2>🕉️ Hindi Calendar &amp; Panchang (हिंदी पंचांग)</h2>
         <div class="controls-grid">
           <div class="control-group" style="grid-column: 1 / -1;">
@@ -100,13 +92,26 @@
           </div>
           <div class="control-group" style="grid-column: 1 / -1; margin-top: 0.3rem;">
             <label>📜 Month Naming Style (मास नाम पद्धति)</label>
-            <select id="hindiMonthStyle" onchange="renderPreview()"
-              style="width: 100%; padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border); font-weight: 600; color: var(--text);">
-              <option value="panchang_chaitra" selected>पंचांग नववर्ष: चैत्र मास से (१. चैत्र, २. वैशाख...)</option>
-              <option value="panchang">पंचांग मास: ईस्वी अनुसार (पौष-माघ, माघ-फाल्गुन...)</option>
-              <option value="panchang_greg">पंचांग + अंग्रेजी मास (चैत्र-वैशाख / अप्रैल...)</option>
-              <option value="hindi_greg">हिंदी मास (जनवरी, फरवरी, मार्च...)</option>
+            <!-- Hidden real select for value binding -->
+            <select id="hindiMonthStyle" onchange="renderPreview()" style="display:none;">
+              <option value="panchang_chaitra" selected></option>
+              <option value="panchang"></option>
+              <option value="panchang_greg"></option>
+              <option value="hindi_greg"></option>
             </select>
+            <!-- Custom styled dropdown -->
+            <div id="monthStyleDropdown" style="position: relative; width: 100%;">
+              <div id="monthStyleSelected" onclick="toggleMonthStyleDropdown()"
+                style="cursor: pointer; border: 2px solid var(--border); border-radius: 10px; background: white; padding: 0.55rem 0.9rem; display: flex; flex-direction: column; gap: 1px; transition: border-color 0.2s, box-shadow 0.2s; user-select: none;">
+                <!-- filled by JS -->
+              </div>
+              <div id="monthStyleOptions"
+                style="display:none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 999;
+                       background: white; border: 2px solid var(--border); border-radius: 10px;
+                       box-shadow: 0 8px 24px rgba(0,0,0,0.12); overflow: hidden;">
+                <!-- filled by JS -->
+              </div>
+            </div>
           </div>
           <div class="control-group"
             style="grid-column: 1 / -1; display: flex; align-items: center; gap: 0.6rem; margin-top: 0.4rem; background: #fffbe0; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid #fde68a;">
@@ -130,10 +135,6 @@
       </div>
 
       <div class="control-panel" id="imageColorsPanel">
-        <div class="mobile-drawer-header">
-          <span>🖼️ Image &amp; Colors</span>
-          <button type="button" class="drawer-close-btn" onclick="switchMobileTab('none')">✕ Close</button>
-        </div>
         <h2>🎨 Image &amp; Colors</h2>
         <div style="display: flex; flex-direction: column; gap: 0.8rem;">
           <div class="control-group">
@@ -206,10 +207,6 @@
       </div>
 
       <div class="editor-panel" id="customNotesPanel">
-        <div class="mobile-drawer-header">
-          <span>✏️ Custom Text / Notes</span>
-          <button type="button" class="drawer-close-btn" onclick="switchMobileTab('none')">✕ Close</button>
-        </div>
         <h2 class="section-title">✏️ Add Custom Text / Notes</h2>
         <div class="toolbar" id="toolbar">
           <select id="fontFamily" title="Font Family">
@@ -347,22 +344,15 @@
       </div>
     </div> <!-- end main-content -->
 
-    <div class="sidebar-right">
-      <div class="control-panel" id="templateLayoutPanel">
-        <div class="mobile-drawer-header">
-          <span>📐 Choose Template Layout</span>
-          <button type="button" class="drawer-close-btn" onclick="switchMobileTab('none')">✕ Close</button>
+    <div class="sidebar-right" id="sidebar-right-mobile">
+      <div class="view-panels-row">
+        <div class="control-panel" id="templateLayoutPanel">
+          <h2 class="section-title">📐 Choose Template Layout</h2>
+          <div class="cards-scroll" id="templateContainer"></div>
         </div>
-        <h2 class="section-title">📐 Choose Template Layout</h2>
-        <div class="cards-scroll" id="templateContainer"></div>
-      </div>
-      <div class="control-panel" id="themeLayoutPanel">
-        <div class="mobile-drawer-header">
-          <span>🎨 Choose Theme</span>
-          <button type="button" class="drawer-close-btn" onclick="switchMobileTab('none')">✕ Close</button>
-        </div>
-        <h2 class="section-title">🎨 Choose Theme</h2>
-        <div class="cards-scroll" id="themeContainer"></div>
+        <div class="control-panel" id="themeLayoutPanel">
+          <h2 class="section-title">🎨 Choose Theme</h2>
+          <div class="cards-scroll" id="themeContainer"></div>
 
         <!-- Custom Theme Color Picker -->
         <div id="customThemePanel" style="display:none; margin-top: 1rem; padding: 1rem; background: #f8fafc; border: 2px solid var(--border); border-radius: 12px; animation: fadeInDown 0.2s ease;">
@@ -413,22 +403,19 @@
           </div>
           <button type="button" onclick="resetCustomTheme()" style="margin-top: 0.75rem; width: 100%; padding: 0.45rem; border: 1.5px solid var(--border); border-radius: 8px; background: white; font-size: 0.8rem; font-weight: 700; color: var(--text-light); cursor: pointer; transition: all 0.2s;">↺ Reset to Default</button>
         </div>
-      </div>
-    </div>
-  </div>
+      </div> <!-- end themeLayoutPanel -->
+      </div> <!-- end view-panels-row -->
+    </div> <!-- end sidebar-right -->
+  </div> <!-- end container -->
 
   <footer class="footer">
     <p>📅 PDF Calendar Generator © 2026 — Built with ❤️</p>
   </footer>
 
   <nav class="mobile-bottom-nav">
-    <button type="button" class="bottom-nav-btn" onclick="switchMobileTab('layout')" id="nav-tab-layout">
-      <span class="icon">📐</span>
-      <span>Layout</span>
-    </button>
-    <button type="button" class="bottom-nav-btn" onclick="switchMobileTab('theme')" id="nav-tab-theme">
-      <span class="icon">🎨</span>
-      <span>Theme</span>
+    <button type="button" class="bottom-nav-btn" onclick="switchMobileTab('view')" id="nav-tab-view">
+      <span class="icon">🗂️</span>
+      <span>View</span>
     </button>
     <button type="button" class="bottom-nav-btn" onclick="switchMobileTab('notes')" id="nav-tab-notes">
       <span class="icon">✏️</span>
@@ -445,6 +432,131 @@
   </nav>
 
   <script>
+    // ===== Custom Month Naming Style Dropdown =====
+    const MONTH_STYLE_OPTIONS = [
+      {
+        value: 'panchang_chaitra',
+        enLabel: 'Panchang New Year Style',
+        enSub:   'Chaitra → Vaishakh → Jyestha…',
+        hiLabel: 'पंचांग नववर्ष: चैत्र मास से',
+        hiSub:   '१. चैत्र, २. वैशाख, ३. ज्येष्ठ…'
+      },
+      {
+        value: 'panchang',
+        enLabel: 'Panchang Months (Gregorian order)',
+        enSub:   'Paush-Magh, Magh-Phalgun…',
+        hiLabel: 'पंचांग मास: ईस्वी अनुसार',
+        hiSub:   'पौष-माघ, माघ-फाल्गुन…'
+      },
+      {
+        value: 'panchang_greg',
+        enLabel: 'Panchang + English Month',
+        enSub:   'Chaitra-Vaishakh / April…',
+        hiLabel: 'पंचांग + अंग्रेजी मास',
+        hiSub:   'चैत्र-वैशाख / अप्रैल…'
+      },
+      {
+        value: 'hindi_greg',
+        enLabel: 'Hindi Transliteration',
+        enSub:   'January, February, March…',
+        hiLabel: 'हिंदी मास',
+        hiSub:   'जनवरी, फरवरी, मार्च…'
+      }
+    ];
+
+    let _monthStyleOpen = false;
+
+    function buildMonthStyleDropdown() {
+      const sel     = document.getElementById('monthStyleSelected');
+      const opts    = document.getElementById('monthStyleOptions');
+      if (!sel || !opts) return;
+
+      const currentVal = document.getElementById('hindiMonthStyle').value || 'panchang_chaitra';
+      const current = MONTH_STYLE_OPTIONS.find(o => o.value === currentVal) || MONTH_STYLE_OPTIONS[0];
+
+      // Render selected display
+      sel.innerHTML = _buildOptionHTML(current, true);
+
+      // Render options list
+      opts.innerHTML = MONTH_STYLE_OPTIONS.map(o => {
+        const isActive = o.value === currentVal;
+        return `<div onclick="selectMonthStyle('${o.value}')" style="
+            padding: 0.65rem 0.9rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            background: ${isActive ? 'linear-gradient(135deg,#eef2ff,#f5f3ff)' : 'white'};
+            transition: background 0.15s;
+          "
+          onmouseenter="this.style.background='#f8fafc'"
+          onmouseleave="this.style.background='${isActive ? 'linear-gradient(135deg,#eef2ff,#f5f3ff)' : 'white'}'">
+          ${_buildOptionHTML(o, false, isActive)}
+        </div>`;
+      }).join('');
+    }
+
+    function _buildOptionHTML(opt, isSelected, isActive) {
+      const checkmark = isActive ? '<span style="color:#4f46e5;font-weight:900;font-size:1rem;margin-left:4px;">✓</span>' : '';
+      return `
+        <div style="display:flex;flex-direction:column;gap:1px;width:100%;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;flex-direction:column;gap:1px;flex:1;">
+              <span style="font-size:0.88rem;font-weight:700;color:#1e293b;line-height:1.3;">${opt.enLabel}</span>
+              <span style="font-size:0.73rem;font-weight:500;color:#64748b;line-height:1.2;">${opt.enSub}</span>
+            </div>
+            ${isActive ? checkmark : (isSelected ? '<span style="font-size:0.85rem;color:#94a3b8;">▾</span>' : '')}
+          </div>
+          <div style="margin-top:3px;padding:3px 6px;background:#fffbeb;border-radius:5px;border:1px solid #fde68a;display:inline-block;width:fit-content;max-width:100%;">
+            <span style="font-size:0.78rem;font-weight:700;color:#b45309;line-height:1.3;">${opt.hiLabel}</span>
+            <br>
+            <span style="font-size:0.68rem;font-weight:500;color:#92400e;line-height:1.2;">${opt.hiSub}</span>
+          </div>
+        </div>`;
+    }
+
+    function toggleMonthStyleDropdown() {
+      const opts = document.getElementById('monthStyleOptions');
+      const sel  = document.getElementById('monthStyleSelected');
+      if (!opts) return;
+      _monthStyleOpen = !_monthStyleOpen;
+      opts.style.display = _monthStyleOpen ? 'block' : 'none';
+      if (sel) {
+        sel.style.borderColor = _monthStyleOpen ? 'var(--primary)' : 'var(--border)';
+        sel.style.boxShadow   = _monthStyleOpen ? '0 0 0 3px rgba(79,70,229,0.15)' : 'none';
+      }
+    }
+
+    function selectMonthStyle(val) {
+      const hidden = document.getElementById('hindiMonthStyle');
+      if (hidden) {
+        hidden.value = val;
+        hidden.dispatchEvent(new Event('change'));
+      }
+      _monthStyleOpen = false;
+      const opts = document.getElementById('monthStyleOptions');
+      const sel  = document.getElementById('monthStyleSelected');
+      if (opts) opts.style.display = 'none';
+      if (sel) { sel.style.borderColor = 'var(--border)'; sel.style.boxShadow = 'none'; }
+      buildMonthStyleDropdown();
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener('click', function(e) {
+      const dropdown = document.getElementById('monthStyleDropdown');
+      if (dropdown && !dropdown.contains(e.target) && _monthStyleOpen) {
+        _monthStyleOpen = false;
+        const opts = document.getElementById('monthStyleOptions');
+        const sel  = document.getElementById('monthStyleSelected');
+        if (opts) opts.style.display = 'none';
+        if (sel) { sel.style.borderColor = 'var(--border)'; sel.style.boxShadow = 'none'; }
+      }
+    });
+
+    // Build dropdown once DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      buildMonthStyleDropdown();
+    });
+    // ===== End Custom Month Naming Style Dropdown =====
+
     function switchMobileTab(tab) {
       const currentTab = document.body.getAttribute('data-mobile-tab') || 'none';
 
@@ -459,8 +571,7 @@
 
         setTimeout(() => {
           let targetEl = null;
-          if (tab === 'layout') targetEl = document.getElementById('templateLayoutPanel');
-          else if (tab === 'theme') targetEl = document.getElementById('themeLayoutPanel');
+          if (tab === 'view') targetEl = document.getElementById('sidebar-right-mobile');
           else if (tab === 'notes') targetEl = document.getElementById('customNotesPanel');
           else if (tab === 'colors') targetEl = document.getElementById('imageColorsPanel');
           else if (tab === 'settings') targetEl = document.getElementById('settingsPanel');

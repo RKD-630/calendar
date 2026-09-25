@@ -259,33 +259,37 @@
       display: none !important;
     }
 
-    /* "layout" tab: Choose Template Layout ONLY */
-    body[data-mobile-tab="layout"] .sidebar-controls,
-    body[data-mobile-tab="layout"] .topbar-controls,
-    body[data-mobile-tab="layout"] #themeLayoutPanel {
+    /* "view" tab: Template Layout + Theme side by side in a horizontal scroll row */
+    body[data-mobile-tab="view"] .sidebar-controls,
+    body[data-mobile-tab="view"] .topbar-controls {
       display: none !important;
     }
-    body[data-mobile-tab="layout"] .sidebar-right {
+    body[data-mobile-tab="view"] .sidebar-right {
+      display: block !important;
+      overflow-x: visible !important;
+    }
+    body[data-mobile-tab="view"] #templateLayoutPanel,
+    body[data-mobile-tab="view"] #themeLayoutPanel {
+      display: block !important;
+    }
+    /* In "view" tab: place both panels in a horizontal scrollable row */
+    body[data-mobile-tab="view"] .sidebar-right {
+      overflow-x: auto !important;
+      overflow-y: visible !important;
+    }
+    body[data-mobile-tab="view"] .sidebar-right > * {
+      /* both panels stack normally — each full width */
+    }
+    /* Both panels stacked vertically in "View" tab */
+    body[data-mobile-tab="view"] .view-panels-row {
       display: flex !important;
       flex-direction: column !important;
+      gap: 0.75rem !important;
     }
-    body[data-mobile-tab="layout"] #templateLayoutPanel {
-      display: block !important;
+    body[data-mobile-tab="view"] .view-panels-row > .control-panel {
+      width: 100% !important;
     }
 
-    /* "theme" tab: Choose Theme ONLY */
-    body[data-mobile-tab="theme"] .sidebar-controls,
-    body[data-mobile-tab="theme"] .topbar-controls,
-    body[data-mobile-tab="theme"] #templateLayoutPanel {
-      display: none !important;
-    }
-    body[data-mobile-tab="theme"] .sidebar-right {
-      display: flex !important;
-      flex-direction: column !important;
-    }
-    body[data-mobile-tab="theme"] #themeLayoutPanel {
-      display: block !important;
-    }
 
     /* "notes" tab: Custom Text / Notes ONLY */
     body[data-mobile-tab="notes"] .sidebar-right,
@@ -332,6 +336,14 @@
     }
     body[data-mobile-tab="settings"] #hindiCalendarPanel {
       display: block !important;
+    }
+
+    /* ===== 25% size reduction for Notes / Colors / Settings tab panels ===== */
+    body[data-mobile-tab="notes"] #customNotesPanel,
+    body[data-mobile-tab="colors"] #imageColorsPanel,
+    body[data-mobile-tab="settings"] .topbar-controls .topbar-inner,
+    body[data-mobile-tab="settings"] #hindiCalendarPanel {
+      zoom: 0.75;
     }
 
     /* Mobile Calendar Action Toolbar (Icon Buttons) */
@@ -482,41 +494,121 @@
       cursor: pointer !important;
     }
 
-    /* ===== MOBILE: 35% smaller theme & template cards ===== */
-    .sidebar-right .cards-scroll {
-      display: grid !important;
-      grid-template-columns: repeat(3, 1fr) !important;
-      gap: 0.45rem !important;
-      overflow-x: visible !important;
-      padding-bottom: 0 !important;
+    /* ===== MOBILE: template cards — horizontal drag row ===== */
+    #templateLayoutPanel .cards-scroll {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      gap: 0.55rem !important;
+      overflow-x: auto !important;
+      overflow-y: visible !important;
+      scroll-snap-type: x mandatory !important;
+      -webkit-overflow-scrolling: touch !important;
+      padding: 0.25rem 0.1rem 0.6rem !important;
     }
-    .sidebar-right .theme-card,
-    .sidebar-right .template-card {
-      min-width: 0 !important;
-      padding: 0.52rem !important;
+    #templateLayoutPanel .cards-scroll::-webkit-scrollbar {
+      height: 4px !important;
+    }
+    #templateLayoutPanel .cards-scroll::-webkit-scrollbar-track {
+      background: var(--border) !important;
+      border-radius: 2px !important;
+    }
+    #templateLayoutPanel .cards-scroll::-webkit-scrollbar-thumb {
+      background: var(--primary-light) !important;
+      border-radius: 2px !important;
+    }
+    #templateLayoutPanel .template-card {
+      flex: 0 0 auto !important;
+      min-width: 80px !important;
+      width: 80px !important;
+      scroll-snap-align: start !important;
+      padding: 0.65rem 0.5rem !important;
       border-width: 2px !important;
-      border-radius: 8px !important;
+      border-radius: 10px !important;
+      text-align: center !important;
+    }
+    #templateLayoutPanel .template-preview {
+      width: 56px !important;
+      height: 44px !important;
+      font-size: 1.1rem !important;
+      margin-bottom: 0.35rem !important;
+    }
+    #templateLayoutPanel .template-card span {
+      font-size: 0.58rem !important;
+      display: block !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    /* ===== MOBILE: theme cards — horizontal drag row (same as templates) ===== */
+    #themeLayoutPanel .cards-scroll {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      gap: 0.55rem !important;
+      overflow-x: auto !important;
+      overflow-y: visible !important;
+      scroll-snap-type: x mandatory !important;
+      -webkit-overflow-scrolling: touch !important;
+      padding: 0.25rem 0.1rem 0.6rem !important;
+    }
+    #themeLayoutPanel .cards-scroll::-webkit-scrollbar {
+      height: 4px !important;
+    }
+    #themeLayoutPanel .cards-scroll::-webkit-scrollbar-track {
+      background: var(--border) !important;
+      border-radius: 2px !important;
+    }
+    #themeLayoutPanel .cards-scroll::-webkit-scrollbar-thumb {
+      background: var(--primary-light) !important;
+      border-radius: 2px !important;
+    }
+    .sidebar-right .theme-card {
+      flex: 0 0 auto !important;
+      min-width: 80px !important;
+      width: 80px !important;
+      scroll-snap-align: start !important;
+      padding: 0.65rem 0.5rem !important;
+      border-width: 2px !important;
+      border-radius: 10px !important;
+      text-align: center !important;
     }
     .sidebar-right .theme-preview {
-      width: 39px !important;
-      height: 39px !important;
+      width: 46px !important;
+      height: 46px !important;
       margin-bottom: 0.3rem !important;
       border-width: 2px !important;
     }
-    .sidebar-right .template-preview {
-      width: 52px !important;
-      height: 39px !important;
-      font-size: 0.975rem !important;
-      margin-bottom: 0.3rem !important;
-    }
-    .sidebar-right .theme-card span,
-    .sidebar-right .template-card span {
-      font-size: 0.52rem !important;
+    .sidebar-right .theme-card span {
+      font-size: 0.55rem !important;
+      display: block !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
     }
     .sidebar-right .section-title {
       font-size: 0.9rem !important;
       margin-bottom: 0.55rem !important;
     }
+
+    /* ===== view-panels-row: vertical stack in "View" tab ===== */
+    .view-panels-row {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.75rem !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .view-panels-row > .control-panel {
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+  }
+
+  /* Desktop: view-panels-row is a transparent pass-through */
+  .view-panels-row {
+    display: contents;
   }
 
   .sidebar-controls, .sidebar-right {

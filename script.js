@@ -65,18 +65,34 @@ const MONTHS_PANCHANG_FULL = [
 ];
 
 const MONTHS_PANCHANG_CHAITRA = [
-  '१. चैत्र - वैशाख (मार्च/अप्रैल)',
-  '२. वैशाख - ज्येष्ठ (अप्रैल/मई)',
-  '३. ज्येष्ठ - आषाढ़ (मई/जून)',
-  '४. आषाढ़ - श्रावण (जून/जुलाई)',
-  '५. श्रावण - भाद्रपद (जुलाई/अगस्त)',
-  '६. भाद्रपद - आश्विन (अगस्त/सितंबर)',
-  '७. आश्विन - कार्तिक (सितंबर/अक्टूबर)',
-  '८. कार्तिक - मार्गशीर्ष (अक्टूबर/नवंबर)',
-  '९. मार्गशीर्ष - पौष (नवंबर/दिसंबर)',
-  '१०. पौष - माघ (दिसंबर/जनवरी)',
-  '११. माघ - फाल्गुन (जनवरी/फरवरी)',
-  '१२. फाल्गुन - चैत्र (फरवरी/मार्च)'
+  '१. चैत्र',
+  '२. वैशाख',
+  '३. ज्येष्ठ',
+  '४. आषाढ़',
+  '५. श्रावण',
+  '६. भाद्रपद',
+  '७. आश्विन',
+  '८. कार्तिक',
+  '९. मार्गशीर्ष',
+  '१०. पौष',
+  '११. माघ',
+  '१२. फाल्गुन'
+];
+
+// Sub-text (Gregorian month range) for panchang_chaitra
+const MONTHS_PANCHANG_CHAITRA_SUB = [
+  '(मार्च - अप्रैल)',
+  '(अप्रैल - मई)',
+  '(मई - जून)',
+  '(जून - जुलाई)',
+  '(जुलाई - अगस्त)',
+  '(अगस्त - सितंबर)',
+  '(सितंबर - अक्टूबर)',
+  '(अक्टूबर - नवंबर)',
+  '(नवंबर - दिसंबर)',
+  '(दिसंबर - जनवरी)',
+  '(जनवरी - फरवरी)',
+  '(फरवरी - मार्च)'
 ];
 
 function formatNumber(num) {
@@ -134,54 +150,58 @@ function getMonthHeaderHTML(monthIndex, hideSub = false, isCompact = false) {
     return `<span style="color: #d97706; font-weight: 800;">${getMonthName(monthIndex, isCompact)}</span>`;
   }
 
-  let pair;
+  // panchang_chaitra: single month name with amber underline (no bg)
   if (style === 'panchang_chaitra') {
-    const chaitraPairs = [
-      { m1: '१. चैत्र', m2: 'वैशाख', sub: '(मार्च/अप्रैल)' },
-      { m1: '२. वैशाख', m2: 'ज्येष्ठ', sub: '(अप्रैल/मई)' },
-      { m1: '३. ज्येष्ठ', m2: 'आषाढ़', sub: '(मई/जून)' },
-      { m1: '४. आषाढ़', m2: 'श्रावण', sub: '(जून/जुलाई)' },
-      { m1: '५. श्रावण', m2: 'भाद्रपद', sub: '(जुलाई/अगस्त)' },
-      { m1: '६. भाद्रपद', m2: 'आश्विन', sub: '(अगस्त/सितंबर)' },
-      { m1: '७. आश्विन', m2: 'कार्तिक', sub: '(सितंबर/अक्टूबर)' },
-      { m1: '८. कार्तिक', m2: 'मार्गशीर्ष', sub: '(अक्टूबर/नवंबर)' },
-      { m1: '९. मार्गशीर्ष', m2: 'पौष', sub: '(नवंबर/दिसंबर)' },
-      { m1: '१०. पौष', m2: 'माघ', sub: '(दिसंबर/जनवरी)' },
-      { m1: '११. माघ', m2: 'फाल्गुन', sub: '(जनवरी/फरवरी)' },
-      { m1: '१२. फाल्गुन', m2: 'चैत्र', sub: '(फरवरी/मार्च)' }
-    ];
-    pair = chaitraPairs[monthIndex];
-  } else {
-    const janPairs = [
-      { m1: 'पौष', m2: 'माघ', sub: '(जनवरी)' },
-      { m1: 'माघ', m2: 'फाल्गुन', sub: '(फरवरी)' },
-      { m1: 'फाल्गुन', m2: 'चैत्र', sub: '(मार्च)' },
-      { m1: 'चैत्र', m2: 'वैशाख', sub: '(अप्रैल)' },
-      { m1: 'वैशाख', m2: 'ज्येष्ठ', sub: '(मई)' },
-      { m1: 'ज्येष्ठ', m2: 'आषाढ़', sub: '(जून)' },
-      { m1: 'आषाढ़', m2: 'श्रावण', sub: '(जुलाई)' },
-      { m1: 'श्रावण', m2: 'भाद्रपद', sub: '(अगस्त)' },
-      { m1: 'भाद्रपद', m2: 'आश्विन', sub: '(सितंबर)' },
-      { m1: 'आश्विन', m2: 'कार्तिक', sub: '(अक्टूबर)' },
-      { m1: 'कार्तिक', m2: 'मार्गशीर्ष', sub: '(नवंबर)' },
-      { m1: 'मार्गशीर्ष', m2: 'पौष', sub: '(दिसंबर)' }
-    ];
-    pair = janPairs[monthIndex];
+    const m1 = MONTHS_PANCHANG_CHAITRA[monthIndex];
+    const sub = MONTHS_PANCHANG_CHAITRA_SUB[monthIndex];
+    const subStr = hideSub ? '' : (isCompact
+      ? `<span style="font-size: 0.75em; margin-left: 4px; color: #64748b; font-weight: 600;">${sub}</span>`
+      : `<span style="font-size: 0.82em; margin-left: 6px; color: #64748b; font-weight: 600;">${sub}</span>`);
+    const nameStyle = isCompact
+      ? `color: #b45309; font-weight: 800; font-size: 0.9em; text-decoration: underline; text-decoration-color: #b45309; text-underline-offset: 3px; text-decoration-thickness: 2px;`
+      : `color: #b45309; font-weight: 800; font-size: 0.95em; text-decoration: underline; text-decoration-color: #b45309; text-underline-offset: 4px; text-decoration-thickness: 2.5px;`;
+    return `<span style="${nameStyle}">${m1}</span>${subStr}`;
   }
+
+  // panchang / panchang_greg: two month names (m1 amber underline, m2 blue underline, no bg)
+  const janPairs = [
+    { m1: 'पौष', m2: 'माघ', sub: '(जनवरी)' },
+    { m1: 'माघ', m2: 'फाल्गुन', sub: '(फरवरी)' },
+    { m1: 'फाल्गुन', m2: 'चैत्र', sub: '(मार्च)' },
+    { m1: 'चैत्र', m2: 'वैशाख', sub: '(अप्रैल)' },
+    { m1: 'वैशाख', m2: 'ज्येष्ठ', sub: '(मई)' },
+    { m1: 'ज्येष्ठ', m2: 'आषाढ़', sub: '(जून)' },
+    { m1: 'आषाढ़', m2: 'श्रावण', sub: '(जुलाई)' },
+    { m1: 'श्रावण', m2: 'भाद्रपद', sub: '(अगस्त)' },
+    { m1: 'भाद्रपद', m2: 'आश्विन', sub: '(सितंबर)' },
+    { m1: 'आश्विन', m2: 'कार्तिक', sub: '(अक्टूबर)' },
+    { m1: 'कार्तिक', m2: 'मार्गशीर्ष', sub: '(नवंबर)' },
+    { m1: 'मार्गशीर्ष', m2: 'पौष', sub: '(दिसंबर)' }
+  ];
+  const pair = janPairs[monthIndex];
+
+  // Underline style for m1 (amber) and m2 (blue) — no background
+  const m1Style = isCompact
+    ? `color: #b45309; font-weight: 800; font-size: 0.85em; text-decoration: underline; text-decoration-color: #b45309; text-underline-offset: 3px; text-decoration-thickness: 2px;`
+    : `color: #b45309; font-weight: 800; font-size: 0.95em; text-decoration: underline; text-decoration-color: #b45309; text-underline-offset: 4px; text-decoration-thickness: 2.5px;`;
+  const m2Style = isCompact
+    ? `color: #0369a1; font-weight: 800; font-size: 0.85em; text-decoration: underline; text-decoration-color: #0369a1; text-underline-offset: 3px; text-decoration-thickness: 2px;`
+    : `color: #0369a1; font-weight: 800; font-size: 0.95em; text-decoration: underline; text-decoration-color: #0369a1; text-underline-offset: 4px; text-decoration-thickness: 2.5px;`;
+  const sepStyle = `margin: 0 ${isCompact ? '2px' : '5px'}; color: #94a3b8; font-weight: 700;`;
 
   if (isCompact) {
     const subStr = (hideSub || style === 'panchang') ? '' : `<span style="font-size: 0.75em; margin-left: 3px; color: #64748b; font-weight: 600;">${pair.sub}</span>`;
-    return `<span style="color: #b45309; font-weight: 800; background: #fef3c7; padding: 1px 5px; border-radius: 4px; font-size: 0.85em; display: inline-block;">${pair.m1}</span>` +
-           `<span style="margin: 0 2px; color: #94a3b8; font-weight: 700;">-</span>` +
-           `<span style="color: #0369a1; font-weight: 800; background: #e0f2fe; padding: 1px 5px; border-radius: 4px; font-size: 0.85em; display: inline-block;">${pair.m2}</span>` +
+    return `<span style="${m1Style}">${pair.m1}</span>` +
+           `<span style="${sepStyle}">-</span>` +
+           `<span style="${m2Style}">${pair.m2}</span>` +
            subStr;
   }
 
   const subStr = (hideSub || style === 'panchang') ? '' : `<span style="font-size: 0.85em; margin-left: 6px; color: #64748b; font-weight: 600;">${pair.sub}</span>`;
 
-  return `<span style="color: #b45309; font-weight: 800; background: #fef3c7; padding: 3px 8px; border-radius: 6px; box-shadow: inset 0 0 0 1px #fde68a; font-size: 0.95em;">${pair.m1}</span>` +
-         `<span style="margin: 0 5px; color: #94a3b8; font-weight: 700;">-</span>` +
-         `<span style="color: #0369a1; font-weight: 800; background: #e0f2fe; padding: 3px 8px; border-radius: 6px; box-shadow: inset 0 0 0 1px #bae6fd; font-size: 0.95em;">${pair.m2}</span>` +
+  return `<span style="${m1Style}">${pair.m1}</span>` +
+         `<span style="${sepStyle}">-</span>` +
+         `<span style="${m2Style}">${pair.m2}</span>` +
          subStr;
 }
 
@@ -199,46 +219,39 @@ function getLandscapeMonthHeaderHTML(monthIndex) {
     return `<span style="color: #d97706; font-weight: 800; font-size: 1.4rem;">${getMonthName(monthIndex)}</span>`;
   }
 
-  let pair;
+  // panchang_chaitra: single month name in landscape — amber underline, no bg
   if (style === 'panchang_chaitra') {
-    const chaitraPairs = [
-      { m1: '१. चैत्र', m2: 'वैशाख', sub: '(मार्च - अप्रैल)' },
-      { m1: '२. वैशाख', m2: 'ज्येष्ठ', sub: '(अप्रैल - मई)' },
-      { m1: '३. ज्येष्ठ', m2: 'आषाढ़', sub: '(मई - जून)' },
-      { m1: '४. आषाढ़', m2: 'श्रावण', sub: '(जून - जुलाई)' },
-      { m1: '५. श्रावण', m2: 'भाद्रपद', sub: '(जुलाई - अगस्त)' },
-      { m1: '६. भाद्रपद', m2: 'आश्विन', sub: '(अगस्त - सितंबर)' },
-      { m1: '७. आश्विन', m2: 'कार्तिक', sub: '(सितंबर - अक्टूबर)' },
-      { m1: '८. कार्तिक', m2: 'मार्गशीर्ष', sub: '(अक्टूबर - नवंबर)' },
-      { m1: '९. मार्गशीर्ष', m2: 'पौष', sub: '(नवंबर - दिसंबर)' },
-      { m1: '१०. पौष', m2: 'माघ', sub: '(दिसंबर - जनवरी)' },
-      { m1: '११. माघ', m2: 'फाल्गुन', sub: '(जनवरी - फरवरी)' },
-      { m1: '१२. फाल्गुन', m2: 'चैत्र', sub: '(फरवरी - मार्च)' }
-    ];
-    pair = chaitraPairs[monthIndex];
-  } else {
-    const janPairs = [
-      { m1: 'पौष', m2: 'माघ', sub: '(जनवरी)' },
-      { m1: 'माघ', m2: 'फाल्गुन', sub: '(फरवरी)' },
-      { m1: 'फाल्गुन', m2: 'चैत्र', sub: '(मार्च)' },
-      { m1: 'चैत्र', m2: 'वैशाख', sub: '(अप्रैल)' },
-      { m1: 'वैशाख', m2: 'ज्येष्ठ', sub: '(मई)' },
-      { m1: 'ज्येष्ठ', m2: 'आषाढ़', sub: '(जून)' },
-      { m1: 'आषाढ़', m2: 'श्रावण', sub: '(जुलाई)' },
-      { m1: 'श्रावण', m2: 'भाद्रपद', sub: '(अगस्त)' },
-      { m1: 'भाद्रपद', m2: 'आश्विन', sub: '(सितंबर)' },
-      { m1: 'आश्विन', m2: 'कार्तिक', sub: '(अक्टूबर)' },
-      { m1: 'कार्तिक', m2: 'मार्गशीर्ष', sub: '(नवंबर)' },
-      { m1: 'मार्गशीर्ष', m2: 'पौष', sub: '(दिसंबर)' }
-    ];
-    pair = janPairs[monthIndex];
+    const m1 = MONTHS_PANCHANG_CHAITRA[monthIndex];
+    const sub = MONTHS_PANCHANG_CHAITRA_SUB[monthIndex];
+    const subStr = `<div style="font-size: 0.95rem; margin-top: 4px; color: #64748b; font-weight: 700;">${sub}</div>`;
+    return `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; width: 100%;">` +
+           `<span style="color: #b45309; font-weight: 800; font-size: 1.25rem; text-decoration: underline; text-decoration-color: #b45309; text-underline-offset: 5px; text-decoration-thickness: 3px;">${m1}</span>` +
+           subStr +
+           `</div>`;
   }
 
-  const subStr = (style === 'panchang_greg' || style === 'panchang_chaitra') ? `<div style="font-size: 0.95rem; margin-top: 4px; color: #64748b; font-weight: 700;">${pair.sub}</div>` : '';
+  const janPairs = [
+    { m1: 'पौष', m2: 'माघ', sub: '(जनवरी)' },
+    { m1: 'माघ', m2: 'फाल्गुन', sub: '(फरवरी)' },
+    { m1: 'फाल्गुन', m2: 'चैत्र', sub: '(मार्च)' },
+    { m1: 'चैत्र', m2: 'वैशाख', sub: '(अप्रैल)' },
+    { m1: 'वैशाख', m2: 'ज्येष्ठ', sub: '(मई)' },
+    { m1: 'ज्येष्ठ', m2: 'आषाढ़', sub: '(जून)' },
+    { m1: 'आषाढ़', m2: 'श्रावण', sub: '(जुलाई)' },
+    { m1: 'श्रावण', m2: 'भाद्रपद', sub: '(अगस्त)' },
+    { m1: 'भाद्रपद', m2: 'आश्विन', sub: '(सितंबर)' },
+    { m1: 'आश्विन', m2: 'कार्तिक', sub: '(अक्टूबर)' },
+    { m1: 'कार्तिक', m2: 'मार्गशीर्ष', sub: '(नवंबर)' },
+    { m1: 'मार्गशीर्ष', m2: 'पौष', sub: '(दिसंबर)' }
+  ];
+  const pair = janPairs[monthIndex];
 
-  return `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 100%;">` +
-         `<span style="color: #b45309; font-weight: 800; background: #fef3c7; padding: 4px 12px; border-radius: 8px; box-shadow: inset 0 0 0 1px #fde68a; font-size: 1.15rem; display: inline-block;">${pair.m1}</span>` +
-         `<span style="color: #0369a1; font-weight: 800; background: #e0f2fe; padding: 4px 12px; border-radius: 8px; box-shadow: inset 0 0 0 1px #bae6fd; font-size: 1.15rem; display: inline-block;">${pair.m2}</span>` +
+  const subStr = style === 'panchang_greg' ? `<div style="font-size: 0.95rem; margin-top: 4px; color: #64748b; font-weight: 700;">${pair.sub}</div>` : '';
+
+  // m1 amber underline, m2 blue underline — no background
+  return `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; width: 100%;">` +
+         `<span style="color: #b45309; font-weight: 800; font-size: 1.15rem; text-decoration: underline; text-decoration-color: #b45309; text-underline-offset: 5px; text-decoration-thickness: 3px;">${pair.m1}</span>` +
+         `<span style="color: #0369a1; font-weight: 800; font-size: 1.15rem; text-decoration: underline; text-decoration-color: #0369a1; text-underline-offset: 5px; text-decoration-thickness: 3px;">${pair.m2}</span>` +
          subStr +
          `</div>`;
 }
@@ -252,21 +265,7 @@ function get1ColSubMonthName(monthIndex) {
   const style = styleEl ? styleEl.value : 'panchang_chaitra';
   
   if (style === 'panchang_chaitra') {
-    const subs = [
-      '(मार्च - अप्रैल)',
-      '(अप्रैल - मई)',
-      '(मई - जून)',
-      '(जून - जुलाई)',
-      '(जुलाई - अगस्त)',
-      '(अगस्त - सितंबर)',
-      '(सितंबर - अक्टूबर)',
-      '(अक्टूबर - नवंबर)',
-      '(नवंबर - दिसंबर)',
-      '(दिसंबर - जनवरी)',
-      '(जनवरी - फरवरी)',
-      '(फरवरी - मार्च)'
-    ];
-    return subs[monthIndex];
+    return MONTHS_PANCHANG_CHAITRA_SUB[monthIndex];
   } else if (style === 'panchang' || style === 'panchang_greg') {
     return `(${MONTHS_HI[monthIndex]})`;
   }
